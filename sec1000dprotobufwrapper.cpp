@@ -4,6 +4,10 @@
 #include "sec1000dprotobufwrapper.h"
 
 
+cSec1000dProtobufWrapper::cSec1000dProtobufWrapper()
+{
+}
+
 google::protobuf::Message *cSec1000dProtobufWrapper::byteArrayToProtobuf(QByteArray bA)
 {
     ProtobufMessage::NetMessage *proto = new ProtobufMessage::NetMessage();

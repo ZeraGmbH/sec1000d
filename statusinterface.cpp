@@ -2,6 +2,10 @@
 #include "protonetcommand.h"
 
 
+cStatusInterface::cStatusInterface()
+{
+}
+
 void cStatusInterface::initSCPIConnection(QString leadingNodes, cSCPI *scpiInterface)
 {
     cSCPIDelegate* delegate;

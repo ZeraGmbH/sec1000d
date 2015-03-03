@@ -7,10 +7,7 @@ class cSec1000dProtobufWrapper : public ProtoNetWrapper
 {
 public:
   cSec1000dProtobufWrapper();
-
-
   google::protobuf::Message *byteArrayToProtobuf(QByteArray bA);
-
   QByteArray protobufToByteArray(google::protobuf::Message *pMessage);
 };
 

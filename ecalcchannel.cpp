@@ -7,14 +7,16 @@
 #include <scpi.h>
 #include <scpicommand.h>
 
+#include "sec1000d.h"
 #include "scpiconnection.h"
 #include "ecalcchannel.h"
 #include "fpgasettings.h"
 #include "protonetcommand.h"
 
+extern void SigHandler(int);
 
-cECalculatorChannel::cECalculatorChannel(cECalculatorSettings* esettings, cFPGASettings* fsettings, quint16 nr)
-    :m_pecalcsettings(esettings), m_pfpgasettings(fsettings), m_nNr(nr)
+cECalculatorChannel::cECalculatorChannel(cSEC1000dServer* server, cECalculatorSettings* esettings, cFPGASettings* fsettings, quint16 nr)
+    :m_pMyServer(server), m_pecalcsettings(esettings), m_pfpgasettings(fsettings), m_nNr(nr)
 {
     m_nBaseAdress = m_pecalcsettings->getBaseAdress();
     m_nMyAdress = m_nBaseAdress + (nr << 4);
@@ -107,6 +109,12 @@ void cECalculatorChannel::free()
 }
 
 
+void cECalculatorChannel::setIntReg(quint8 reg)
+{
+    notifierECalcChannelIntReg = reg;
+}
+
+
 void cECalculatorChannel::m_ReadWriteCMD(cProtonetCommand *protoCmd)
 {
     m_ReadWriteRegister(protoCmd, CMDREG);
@@ -121,23 +129,7 @@ void cECalculatorChannel::m_ReadWriteCONF(cProtonetCommand *protoCmd)
 
 void cECalculatorChannel::m_ReadSTATUS(cProtonetCommand *protoCmd)
 {
-    cSCPICommand cmd = protoCmd->m_sInput;
-    QString answ;
-    quint32 reg;
-    int m_nFPGAfd;
-
-    m_nFPGAfd = open(m_pfpgasettings->getDeviceNode().toLatin1().data() ,O_RDWR);
-    lseek(m_nFPGAfd,m_nMyAdress+STATUSREG,0);
-    if (cmd.isQuery())
-    {
-        read(m_nFPGAfd,(char*) &reg, 4);
-        answ =  QString("%1").arg(reg);
-    }
-    else
-        answ = SCPI::scpiAnswer[SCPI::nak];
-
-    close(m_nFPGAfd);
-    protoCmd->m_sOutput = answ;
+    m_ReadRegister(protoCmd, STATUSREG);
 }
 
 
@@ -152,14 +144,11 @@ void cECalculatorChannel::m_ReadWriteINTREG(cProtonetCommand *protoCmd)
     cSCPICommand cmd = protoCmd->m_sInput;
     QString answ;
     quint32 reg;
-    int m_nFPGAfd;
 
-    m_nFPGAfd = open(m_pfpgasettings->getDeviceNode().toLatin1().data() ,O_RDWR);
-    lseek(m_nFPGAfd,m_nMyAdress+INTREG,0);
     if (cmd.isQuery())
     {
         emit notifier(&notifierECalcChannelIntReg);
-        answ =  notifierECalcChannelIntReg.getString(); // we only return the notifiers value
+        answ =  QString("%1").arg(notifierECalcChannelIntReg.getValue()); // we only return the notifiers value
     }
     else
     {
@@ -169,7 +158,10 @@ void cECalculatorChannel::m_ReadWriteINTREG(cProtonetCommand *protoCmd)
             {
                 bool ok;
                 reg = cmd.getParam(0).toULong(&ok);
-                write(m_nFPGAfd,(char*) &reg, 4);
+                lseek(m_pMyServer->DevFileDescriptor,m_nMyAdress+INTREG,0);
+                write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
+                notifierECalcChannelIntReg.setValue(reg);
+                SigHandler(0); // we do so as if the interrupt handler had seen another edge
                 answ = SCPI::scpiAnswer[SCPI::ack];
             }
             else
@@ -179,8 +171,25 @@ void cECalculatorChannel::m_ReadWriteINTREG(cProtonetCommand *protoCmd)
             answ = SCPI::scpiAnswer[SCPI::nak];
     }
 
-    close(m_nFPGAfd);
     protoCmd->m_sOutput = answ;
+}
+
+
+void cECalculatorChannel::m_ReadWriteCOUNTPRESET(cProtonetCommand *protoCmd)
+{
+    return m_ReadWriteRegister(protoCmd, COUNTPRESET);
+}
+
+
+void cECalculatorChannel::m_ReadCOUNTLATCH(cProtonetCommand *protoCmd)
+{
+    m_ReadRegister(protoCmd, COUNTLATCH);
+}
+
+
+void cECalculatorChannel::m_ReadCOUNTACTUAL(cProtonetCommand *protoCmd)
+{
+    m_ReadRegister(protoCmd, COUNTACTUAL);
 }
 
 
@@ -189,13 +198,11 @@ void cECalculatorChannel::m_ReadWriteRegister(cProtonetCommand *protoCmd, quint3
     cSCPICommand cmd = protoCmd->m_sInput;
     QString answ;
     quint32 reg;
-    int m_nFPGAfd;
 
-    m_nFPGAfd = open(m_pfpgasettings->getDeviceNode().toLatin1().data() ,O_RDWR);
-    lseek(m_nFPGAfd,m_nMyAdress+adroffs,0);
     if (cmd.isQuery())
     {
-        read(m_nFPGAfd,(char*) &reg, 4);
+        lseek(m_pMyServer->DevFileDescriptor,m_nMyAdress+adroffs,0);
+        read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
         answ =  QString("%1").arg(reg);
     }
     else
@@ -206,7 +213,8 @@ void cECalculatorChannel::m_ReadWriteRegister(cProtonetCommand *protoCmd, quint3
             {
                 bool ok;
                 reg = cmd.getParam(0).toULong(&ok);
-                write(m_nFPGAfd,(char*) &reg, 4);
+                lseek(m_pMyServer->DevFileDescriptor,m_nMyAdress+adroffs,0);
+                write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
                 answ = SCPI::scpiAnswer[SCPI::ack];
             }
             else
@@ -216,14 +224,32 @@ void cECalculatorChannel::m_ReadWriteRegister(cProtonetCommand *protoCmd, quint3
             answ = SCPI::scpiAnswer[SCPI::nak];
     }
 
-    close(m_nFPGAfd);
+    protoCmd->m_sOutput = answ;
+}
+
+
+void cECalculatorChannel::m_ReadRegister(cProtonetCommand *protoCmd, quint32 adroffs)
+{
+    cSCPICommand cmd = protoCmd->m_sInput;
+    QString answ;
+    quint32 reg;
+
+    if (cmd.isQuery())
+    {
+        lseek(m_pMyServer->DevFileDescriptor,m_nMyAdress+adroffs,0);
+        read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
+        answ =  QString("%1").arg(reg);
+    }
+    else
+        answ = SCPI::scpiAnswer[SCPI::nak];
+
     protoCmd->m_sOutput = answ;
 }
 
 
 void cECalculatorChannel::setNotifierECalcChannelIntReg()
 {
-    notifierECalcChannelIntReg="0"; // we have no interrupt yet
+    notifierECalcChannelIntReg = 0; // we have no interrupt yet
 }
 
 

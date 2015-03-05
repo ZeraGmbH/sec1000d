@@ -25,8 +25,9 @@ cECalculatorInterface::cECalculatorInterface(cSEC1000dServer* server, cETHSettin
     int n = m_pecalcsettings->getNumber();
     for (int i = 0; i < n; i++ )
     {
-        cECalculatorChannel* eChan = new cECalculatorChannel(m_pecalcsettings, m_pfpgasettings, i);
-        m_ECalculatorChannelHash[eChan->getName()] = eChan;
+        cECalculatorChannel* eChan = new cECalculatorChannel(m_pMyServer, m_pecalcsettings, m_pfpgasettings, i);
+        m_ECalculatorChannelList.append(eChan); // we have a list for seq. access
+        m_ECalculatorChannelHash[eChan->getName()] = eChan; // and a hash for access by channel nam3
     }
 }
 
@@ -72,7 +73,7 @@ void cECalculatorInterface::initSCPIConnection(QString leadingNodes, cSCPI* scpi
     for (int i = 0; i < n; i++)
     {
         // we also must connect the signals for notification and for output
-        connect(ecList.at(i), SIGNAL(notifier(cNotificationString*)), this, SIGNAL(notifier(cNotificationString*)));
+        connect(ecList.at(i), SIGNAL(notifier(cNotificationValue*)), this, SIGNAL(notifier(cNotificationValue*)));
         connect(ecList.at(i), SIGNAL(cmdExecutionDone(cProtonetCommand*)), this, SIGNAL(cmdExecutionDone(cProtonetCommand*)));
 
         ecList.at(i)->initSCPIConnection(QString("%1ECALCULATOR").arg(leadingNodes),scpiInterface);

@@ -4,14 +4,13 @@
 #include <QByteArray>
 #include <protonetpeer.h>
 
-#include "notificationstring.h"
+#include "notificationvalue.h"
 
 struct cNotificationData
 {
     ProtoNetPeer *netPeer;
     QByteArray clientID;
-    quint16 notifier;
-    cNotificationString *notString;
+    cNotificationValue *notValue;
 };
 
 #endif // NOTIFICATIONDATA_H

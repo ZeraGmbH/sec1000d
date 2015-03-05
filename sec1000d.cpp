@@ -1,13 +1,19 @@
+#include <unistd.h>
+#include <fcntl.h>
+#include <syslog.h>
+#include <signal.h>
+
 #include <QStateMachine>
 #include <QState>
 #include <QFinalState>
 #include <QStringList>
 #include <QDebug>
-#include <xmlconfigreader.h>
+#include <QByteArray>
 #include <QCoreApplication>
+#include <QSocketNotifier>
+
 #include <protonetserver.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include <xmlconfigreader.h>
 
 #include "sec1000dglobal.h"
 #include "sec1000d.h"
@@ -21,6 +27,22 @@
 #include "systeminfo.h"
 #include "ecalcinterface.h"
 #include "rmconnection.h"
+
+
+
+cSEC1000dServer* SECServer;
+int pipeFD[2];
+char pipeBuf[2] = "I";
+//int anzInt = 0;
+
+void SigHandler(int)
+{
+    if (SECServer->m_pDebugSettings->getDebugLevel() & 2) syslog(LOG_INFO,"sec interrupt received\n");
+    write(pipeFD[1], pipeBuf, 1);
+}
+
+struct sigaction mySigAction;
+// sigset_t mySigmask, origSigmask;
 
 
 cSEC1000dServer::cSEC1000dServer(QObject *parent)
@@ -79,6 +101,10 @@ cSEC1000dServer::~cSEC1000dServer()
     if (m_pECalculatorInterface) delete m_pECalculatorInterface;
     if (m_pSystemInfo) delete m_pSystemInfo;
     if (m_pRMConnection) delete m_pRMConnection;
+
+    close(DevFileDescriptor); // close dev.
+    close(pipeFD[0]);
+    close(pipeFD[1]);
 }
 
 
@@ -94,37 +120,48 @@ void cSEC1000dServer::doConfiguration()
     }
     else
     {
-
-        if (myXMLConfigReader->loadSchema(defaultXSDFile))
+        if ( pipe(pipeFD) == -1 )
         {
-            // we want to initialize all settings first
-            m_pDebugSettings = new cDebugSettings(myXMLConfigReader);
-            connect(myXMLConfigReader,SIGNAL(valueChanged(const QString&)),m_pDebugSettings,SLOT(configXMLInfo(const QString&)));
-            m_pETHSettings = new cETHSettings(myXMLConfigReader);
-            connect(myXMLConfigReader,SIGNAL(valueChanged(const QString&)),m_pETHSettings,SLOT(configXMLInfo(const QString&)));
-            m_pFPGAsettings = new cFPGASettings(myXMLConfigReader);
-            connect(myXMLConfigReader,SIGNAL(valueChanged(const QString&)),m_pFPGAsettings,SLOT(configXMLInfo(const QString&)));
-            m_pECalcSettings = new cECalculatorSettings(myXMLConfigReader);
-            connect(myXMLConfigReader,SIGNAL(valueChanged(const QString&)),m_pECalcSettings,SLOT(configXMLInfo(const QString&)));
-
-            QString s = args.at(1);
-            qDebug() << s;
-
-            if (myXMLConfigReader->loadXML(s)) // the first parameter should be the filename
-            {
-                // xmlfile ok -> nothing to do .. the configreader will emit all configuration
-                // signals and after this the finishedparsingXML signal
-            }
-            else
-            {
-                m_nerror = xmlfileError;
-                emit abortInit();
-            }
+            m_nerror = pipeError;
+            emit abortInit();
         }
         else
         {
-            m_nerror = xsdfileError;
-            emit abortInit();
+            fcntl( pipeFD[1], F_SETFL, O_NONBLOCK);
+            fcntl( pipeFD[0], F_SETFL, O_NONBLOCK);
+            m_pNotifier = new QSocketNotifier(pipeFD[0], QSocketNotifier::Read, this);
+            connect(m_pNotifier, SIGNAL(activated(int)), this, SLOT(SECIntHandler(int)));
+            if (myXMLConfigReader->loadSchema(defaultXSDFile))
+            {
+                // we want to initialize all settings first
+                m_pDebugSettings = new cDebugSettings(myXMLConfigReader);
+                connect(myXMLConfigReader,SIGNAL(valueChanged(const QString&)),m_pDebugSettings,SLOT(configXMLInfo(const QString&)));
+                m_pETHSettings = new cETHSettings(myXMLConfigReader);
+                connect(myXMLConfigReader,SIGNAL(valueChanged(const QString&)),m_pETHSettings,SLOT(configXMLInfo(const QString&)));
+                m_pFPGAsettings = new cFPGASettings(myXMLConfigReader);
+                connect(myXMLConfigReader,SIGNAL(valueChanged(const QString&)),m_pFPGAsettings,SLOT(configXMLInfo(const QString&)));
+                m_pECalcSettings = new cECalculatorSettings(myXMLConfigReader);
+                connect(myXMLConfigReader,SIGNAL(valueChanged(const QString&)),m_pECalcSettings,SLOT(configXMLInfo(const QString&)));
+
+                QString s = args.at(1);
+                qDebug() << s;
+
+                if (myXMLConfigReader->loadXML(s)) // the first parameter should be the filename
+                {
+                    // xmlfile ok -> nothing to do .. the configreader will emit all configuration
+                    // signals and after this the finishedparsingXML signal
+                }
+                else
+                {
+                    m_nerror = xmlfileError;
+                    emit abortInit();
+                }
+            }
+            else
+            {
+                m_nerror = xsdfileError;
+                emit abortInit();
+            }
         }
 
     }
@@ -143,24 +180,44 @@ void cSEC1000dServer::doSetupServer()
     scpiConnectionList.append(m_pECalculatorInterface = new cECalculatorInterface(this, m_pETHSettings, m_pECalcSettings, m_pFPGAsettings));
 
     resourceList.append(m_pECalculatorInterface); // all our resources
+    m_ECalculatorChannelList = m_pECalculatorInterface->getECalcChannelList(); // we use this list in interrupt service
+
+    SECServer = this;
+    m_nDebugLevel = m_pDebugSettings->getDebugLevel();
 
     initSCPIConnections();
 
     myServer->startServer(m_pETHSettings->getPort(server)); // and can start the server now
 
-    // our resource mananager connection must be opened after configuration is done
-    m_pRMConnection = new cRMConnection(m_pETHSettings->getRMIPadr(), m_pETHSettings->getPort(resourcemanager), m_pDebugSettings->getDebugLevel());
-    //connect(m_pRMConnection, SIGNAL(connectionRMError()), this, SIGNAL(abortInit()));
-    // so we must complete our state machine here
-    m_nRetryRMConnect = 100;
-    m_retryTimer.setSingleShot(true);
-    connect(&m_retryTimer, SIGNAL(timeout()), this, SIGNAL(serverSetup()));
+    m_sSECDeviceNode = m_pFPGAsettings->getDeviceNode(); // we try to open the sec device
 
-    stateconnect2RM->addTransition(m_pRMConnection, SIGNAL(connected()), stateSendRMIdentandRegister);
-    stateconnect2RM->addTransition(m_pRMConnection, SIGNAL(connectionRMError()), stateconnect2RMError);
-    stateconnect2RMError->addTransition(this, SIGNAL(serverSetup()), stateconnect2RM);
+    if (SECDevOpen() < 0)
+    {
+        m_nerror = secDeviceError; // and finish if not possible
+        emit abortInit();
+    }
+    else
+    {
+        mySigAction.sa_handler = &SigHandler; // signal handler einrichten
+        sigemptyset(&mySigAction.sa_mask);
+        mySigAction. sa_flags = SA_RESTART;
+        mySigAction.sa_restorer = NULL;
+        sigaction(SIGIO, &mySigAction, NULL); // handler für sigio definieren
+        SetFASync();
+        // our resource mananager connection must be opened after configuration is done
+        m_pRMConnection = new cRMConnection(m_pETHSettings->getRMIPadr(), m_pETHSettings->getPort(resourcemanager), m_pDebugSettings->getDebugLevel());
+        //connect(m_pRMConnection, SIGNAL(connectionRMError()), this, SIGNAL(abortInit()));
+        // so we must complete our state machine here
+        m_nRetryRMConnect = 100;
+        m_retryTimer.setSingleShot(true);
+        connect(&m_retryTimer, SIGNAL(timeout()), this, SIGNAL(serverSetup()));
 
-    emit serverSetup(); // so we enter state machine's next state
+        stateconnect2RM->addTransition(m_pRMConnection, SIGNAL(connected()), stateSendRMIdentandRegister);
+        stateconnect2RM->addTransition(m_pRMConnection, SIGNAL(connectionRMError()), stateconnect2RMError);
+        stateconnect2RMError->addTransition(this, SIGNAL(serverSetup()), stateconnect2RM);
+
+        emit serverSetup(); // so we enter state machine's next state
+    }
 }
 
 
@@ -200,8 +257,40 @@ void cSEC1000dServer::doIdentAndRegister()
 }
 
 
+int cSEC1000dServer::SECDevOpen()
+{
+    if ( (DevFileDescriptor = open(m_sSECDeviceNode.toLatin1().data(), O_RDWR)) < 0 )
+    {
+        if (DEBUG1)  syslog(LOG_ERR,"error opening sec device: %s\n",m_pFPGAsettings->getDeviceNode().toLatin1().data());
+    }
+    return DevFileDescriptor;
+}
 
 
+void cSEC1000dServer::SetFASync()
+{
+    fcntl(DevFileDescriptor, F_SETOWN, getpid()); // wir sind "besitzer" des device
+    int oflags = fcntl(DevFileDescriptor, F_GETFL);
+    fcntl(DevFileDescriptor, F_SETFL, oflags | FASYNC); // async. benachrichtung (sigio) einschalten
+}
 
 
+void cSEC1000dServer::SECIntHandler(int)
+{ // behandelt den sec interrupt
 
+    char buf[2];
+
+    read(pipeFD[0], buf, 1); // first we read the pipe
+
+    int n = m_ECalculatorChannelList.count();
+    QByteArray interruptREGS(n, 0);
+
+    lseek(DevFileDescriptor,m_pECalcSettings->getIrqAdress(),0);
+    read(DevFileDescriptor,interruptREGS.data(), n);
+
+    for (int i = 0; i < n; i++)
+    {
+        quint8 irq = interruptREGS[i];
+        m_ECalculatorChannelList.at(i)->setIntReg(irq); // this will cause notifierto be thrown
+    }
+}

@@ -176,11 +176,10 @@ void cPCBServer::sendAnswer(cProtonetCommand *protoCmd)
 
 void cPCBServer::m_RegisterNotifier(cProtonetCommand *protoCmd)
 {
-    bool ok;
     QString dummy;
     cSCPICommand cmd = protoCmd->m_sInput;
 
-    if (cmd.isCommand(2))
+    if (cmd.isCommand(1)) // we only expect 1 parameter
     {
         cSCPIObject* scpiObject;
         QString query = cmd.getParam(0);
@@ -191,7 +190,6 @@ void cPCBServer::m_RegisterNotifier(cProtonetCommand *protoCmd)
 
             notData.netPeer = protoCmd->m_pPeer;
             notData.clientID = protoCmd->m_clientId;
-            notData.notifier = cmd.getParam(1).toInt(&ok);
 
             notifierRegisterNext.append(notData); // we wait for a notifier signal
 
@@ -340,22 +338,22 @@ void cPCBServer::executeCommand(google::protobuf::Message* cmd)
 }
 
 
-void cPCBServer::establishNewNotifier(cNotificationString *notifier)
+void cPCBServer::establishNewNotifier(cNotificationValue *notifier)
 {
     if (notifierRegisterNext.count() > 0) // if we're waiting for notifier
     {
         disconnect(notifier, 0, 0, 0); // we disconnect first because we only want 1 signal
         cNotificationData notData = notifierRegisterNext.takeFirst(); // we pick the notification data
-        notData.notString = notifier;
+        notData.notValue = notifier;
         notifierRegisterList.append(notData); //
-        connect(notifier, SIGNAL(valueChanged()), this, SLOT(asyncHandler()));
+        connect(notifier, SIGNAL(risingEdge(quint32)), this, SLOT(asyncHandler(quint32)));
     }
 }
 
 
-void cPCBServer::asyncHandler()
+void cPCBServer::asyncHandler(quint32 irqreg)
 {
-    cNotificationString* notifier = qobject_cast<cNotificationString*>(sender());
+    cNotificationValue* notifier = qobject_cast<cNotificationValue*>(sender());
 
     if (notifierRegisterList.count() > 0)
     {
@@ -365,10 +363,10 @@ void cPCBServer::asyncHandler()
             for (int i = 0; i < notifierRegisterList.count(); i++)
             {
                 cNotificationData notData = notifierRegisterList.at(i);
-                if (notData.notString == notifier)
+                if (notData.notValue == notifier)
                 {
                     ProtobufMessage::NetMessage::NetReply *intMessage = protobufIntMessage.mutable_reply();
-                    QString s = QString("Notify:%1").arg(notData.notifier);
+                    QString s = QString("IRQ:%1").arg(irqreg);
                     if (notData.clientID.isEmpty()) // old style communication
                     {
                         QByteArray block;
@@ -404,7 +402,7 @@ void cPCBServer::initSCPIConnections()
     for (int i = 0; i < scpiConnectionList.count(); i++)
     {
         scpiConnectionList.at(i)->initSCPIConnection("",m_pSCPInterface); // we have our interface
-        connect(scpiConnectionList.at(i), SIGNAL(notifier(cNotificationString*)), this, SLOT(establishNewNotifier(cNotificationString*)));
+        connect(scpiConnectionList.at(i), SIGNAL(notifier(cNotificationValue*)), this, SLOT(establishNewNotifier(cNotificationValue*)));
         connect(scpiConnectionList.at(i), SIGNAL(cmdExecutionDone(cProtonetCommand*)), this, SLOT(sendAnswer(cProtonetCommand*)));
     }
 }

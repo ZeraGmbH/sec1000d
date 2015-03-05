@@ -50,10 +50,14 @@ int main( int argc, char *argv[] )
 
     if (r == parameterError)
         syslog(LOG_EMERG,"Abort, wrong parameter count\n") ;
+    if (r == pipeError)
+        syslog(LOG_EMERG,"Abort, could not open pipe\n") ;
     if (r == xsdfileError)
         syslog(LOG_EMERG,"Abort, xsd file error\n") ;
     if (r == xmlfileError)
         syslog(LOG_EMERG,"Abort, xml file error\n") ;
+    if (r == secDeviceError)
+        syslog(LOG_EMERG,"Abort, sec device not found\n") ;
     if (r == rmConnectionError)
         syslog(LOG_EMERG,"Abort, resourcemanager connection error\n") ;
 

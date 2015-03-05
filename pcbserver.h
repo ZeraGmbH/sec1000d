@@ -12,7 +12,7 @@
 
 #include "sec1000dprotobufwrapper.h"
 #include "scpiconnection.h"
-#include "notificationstring.h"
+#include "notificationvalue.h"
 #include "notificationdata.h"
 
 class QTcpSocket;
@@ -139,8 +139,8 @@ private:
 private slots:
     virtual void establishNewConnection(ProtoNetPeer* newClient);
     virtual void executeCommand(google::protobuf::Message *cmd);
-    virtual void establishNewNotifier(cNotificationString* notifier);
-    virtual void asyncHandler();
+    virtual void establishNewNotifier(cNotificationValue *notifier);
+    virtual void asyncHandler(quint32 irqreg);
 };
 
 #endif // PCBSERVER_H

@@ -10,6 +10,7 @@
 
 class QStateMachine;
 class QState;
+class QSocketNotifier;
 class cDebugSettings;
 class cFPGASettings;
 class cETHSettings;
@@ -17,6 +18,7 @@ class cECalculatorSettings;
 class cStatusInterface;
 class cSystemInterface;
 class cECalculatorInterface;
+class cECalculatorChannel;
 class cSystemInfo;
 class cRMConnection;
 
@@ -40,6 +42,8 @@ public:
     cSystemInfo* m_pSystemInfo;
     cRMConnection* m_pRMConnection;
 
+    int DevFileDescriptor; // kerneltreiber wird nur 1x geöffnet und dann gehalten
+    int m_nDebugLevel;
 
 signals:
     void abortInit();
@@ -55,8 +59,14 @@ private:
     quint8 m_nerror;
     int m_nRetryRMConnect;
     QTimer m_retryTimer;
+    QString m_sSECDeviceNode;
+    QList<cECalculatorChannel*> m_ECalculatorChannelList;
+    QSocketNotifier* m_pNotifier;
+    int SECDevOpen();
+    void SetFASync();
 
 private slots:
+    void SECIntHandler(int);
     void doConfiguration();
     void doSetupServer();
     void doCloseServer();

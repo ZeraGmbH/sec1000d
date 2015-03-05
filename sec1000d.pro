@@ -33,12 +33,12 @@ HEADERS	+= \
     systeminfo.h \
     rmconnection.h \
     sec1000dprotobufwrapper.h \
-    notificationstring.h \
     notificationdata.h \
     protonetcommand.h \
     ecalcsettings.h \
     ecalcinterface.h \
-    ecalcchannel.h
+    ecalcchannel.h \
+    notificationvalue.h
 
 SOURCES	+= \
     main.cpp \
@@ -55,11 +55,11 @@ SOURCES	+= \
     resource.cpp \
     rmconnection.cpp \
     sec1000dprotobufwrapper.cpp \
-    notificationstring.cpp \
     protonetcommand.cpp \
     ecalcsettings.cpp \
     ecalcinterface.cpp \
-    ecalcchannel.cpp
+    ecalcchannel.cpp \
+    notificationvalue.cpp
 
 unix {
   UI_DIR = .ui

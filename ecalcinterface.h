@@ -8,7 +8,7 @@
 #include "resource.h"
 #include "scpiconnection.h"
 #include "ecalcchannel.h"
-#include "notificationstring.h"
+#include "notificationvalue.h"
 
 namespace ECalcSystem
 {
@@ -44,6 +44,7 @@ public:
     virtual void initSCPIConnection(QString leadingNodes, cSCPI* scpiInterface);
     virtual void registerResource(cRMConnection *rmConnection, quint16 port);
     virtual void unregisterResource(cRMConnection *rmConnection);
+    QList<cECalculatorChannel*> getECalcChannelList();
 
 protected slots:
     virtual void executeCommand(int cmdCode, cProtonetCommand* protoCmd);
@@ -56,6 +57,7 @@ private:
 
     QString m_sVersion;
 
+    QList<cECalculatorChannel*> m_ECalculatorChannelList;
     QHash<QString,cECalculatorChannel*> m_ECalculatorChannelHash;
     QHash<QByteArray, QString> m_ClientECalcHash; // we hold the set ecalculators by clientid
 

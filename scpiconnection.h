@@ -6,7 +6,7 @@
 #include "scpidelegate.h"
 
 class cSCPI;
-class cNotificationString;
+class cNotificationValue;
 
 
 class cSCPIConnection: public QObject // pure virtual base class for scpi model interfaces
@@ -19,7 +19,7 @@ public:
     virtual void initSCPIConnection(QString leadingNodes, cSCPI* scpiInterface) = 0;
 
 signals:
-    void notifier(cNotificationString* notifier);
+    void notifier(cNotificationValue* notifier);
     void cmdExecutionDone(cProtonetCommand* protoCmd);
 
 protected:

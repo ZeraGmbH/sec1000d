@@ -11,27 +11,26 @@
 #include "notificationvalue.h"
 
 
-#define CMDREG 0x0
-#define CONFREG 0x4
-#define STATUSREG 0x8
-#define INTMASKREG 0xC
-#define INTREG 0x10
-#define COUNTPRESET 0x14
-#define COUNTLATCH 0x18
-#define COUNTACTUAL 0x1C
+#define baseChnName "ec"
+
+namespace ECALCREG {
+    enum { CMD, CONF, STATUS, INTMASK, INTREG, MTCNTin, MTCNTfin, MTCNTact, MTPULSin = 12, MTPAUSEin, MTPULS, MTPAUSE};
+}
+
+namespace ECALCCMDID {
+    enum { COUNTEDGE = 1, COUNTRESET, ERRORMEASMASTER, ERRORMEASSLAVE};
+}
 
 namespace ECalcChannel
 {
 enum Commands
 {
-    cmdCmd,
-    cmdConf,
-    cmdStatus,
-    cmdIntmask,
-    cmdIntreg,
-    cmdCountPreset,
-    cmdCountLatch,
-    cmdCountActual
+    cmdRegister,
+    setSync,
+    setMux,
+    setCmdid,
+    start,
+    stop
 };
 
 }
@@ -71,16 +70,12 @@ private:
     QString m_sName; // the channels name ec0...
     bool m_bSet; // we mark if the channel is occupied
     QByteArray m_ClientId; // we remark the clientid for arbitration purpose
-    void m_ReadWriteCMD(cProtonetCommand* protoCmd);
-    void m_ReadWriteCONF(cProtonetCommand* protoCmd);
-    void m_ReadSTATUS(cProtonetCommand* protoCmd);
-    void m_ReadWriteINTMASK(cProtonetCommand* protoCmd);
-    void m_ReadWriteINTREG(cProtonetCommand* protoCmd);
-    void m_ReadWriteCOUNTPRESET(cProtonetCommand* protoCmd);
-    void m_ReadCOUNTLATCH(cProtonetCommand* protoCmd);
-    void m_ReadCOUNTACTUAL(cProtonetCommand* protoCmd);
-    void m_ReadWriteRegister(cProtonetCommand* protoCmd, quint32 adroffs);
-    void m_ReadRegister(cProtonetCommand* protoCmd, quint32 adroffs);
+    void m_ReadWriteRegister(cProtonetCommand* protoCmd);
+    void m_setSync(cProtonetCommand* protoCmd);
+    void m_setMux(cProtonetCommand* protoCmd);
+    void m_setCmdId(cProtonetCommand* protoCmd);
+    void m_start(cProtonetCommand* protoCmd);
+    void m_stop(cProtonetCommand* protoCmd);
 
     cNotificationValue notifierECalcChannelIntReg;
     void setNotifierECalcChannelIntReg();

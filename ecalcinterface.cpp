@@ -127,6 +127,12 @@ void cECalculatorInterface::unregisterResource(cRMConnection *rmConnection)
 }
 
 
+QList<cECalculatorChannel *> cECalculatorInterface::getECalcChannelList()
+{
+    return m_ECalculatorChannelList;
+}
+
+
 QString cECalculatorInterface::m_ReadVersion(QString &sInput)
 {
     cSCPICommand cmd = sInput;

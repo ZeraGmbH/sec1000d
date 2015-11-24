@@ -9,7 +9,7 @@
                                 <resourcemanager>127.0.0.1</resourcemanager>
 			</ipadress>	
 			<port>
-				<server>6320</server>
+                                <server>6305</server>
 				<resourcemanager>6312</resourcemanager>
 			</port>
 		</ethernet>

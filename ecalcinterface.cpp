@@ -223,7 +223,12 @@ void cECalculatorInterface::m_FreeChannels(cProtonetCommand *protoCmd)
        {
            QStringList sl = m_ClientECalcHash[protoCmd->m_clientId].split(";");
            for (int i = 0; i < sl.count(); i++)
-                m_ECalculatorChannelHash[sl.at(i)]->free();
+           {
+               QString key;
+               key = sl.at(i);
+               if (m_ECalculatorChannelHash.contains(key))
+                   m_ECalculatorChannelHash[key]->free();
+           }
        }
        else
            answ = SCPI::scpiAnswer[SCPI::nak];

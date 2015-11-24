@@ -5,6 +5,11 @@ include(sec1000d.user.pri)
 
 QMAKE_CXXFLAGS += -O0
 
+systemd_notification {
+       DEFINES += SYSTEMD_NOTIFICATION
+       LIBS +=  -lsystemd
+}
+
 LIBS +=  -lSCPI
 LIBS +=  -lproto-net-qt
 LIBS +=  -lzeramisc

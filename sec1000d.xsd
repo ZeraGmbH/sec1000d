@@ -87,7 +87,7 @@
 				<xs:element name="resource">
 					<xs:complexType>
 						<xs:sequence>
-                                                        <xs:element name="ecalcchannel" type="ecunittype">
+                                                        <xs:element name="ecalcchannel" type="ecalcchanneltype"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>	

@@ -217,6 +217,8 @@ void cECalculatorInterface::m_FreeChannels(cProtonetCommand *protoCmd)
     cSCPICommand cmd = protoCmd->m_sInput;
     QString answ;
 
+    answ = SCPI::scpiAnswer[SCPI::nak]; // preset
+
     if (cmd.isCommand(0))
     {
        if (m_ClientECalcHash.contains(protoCmd->m_clientId))
@@ -229,12 +231,9 @@ void cECalculatorInterface::m_FreeChannels(cProtonetCommand *protoCmd)
                if (m_ECalculatorChannelHash.contains(key))
                    m_ECalculatorChannelHash[key]->free();
            }
+           answ = SCPI::scpiAnswer[SCPI::ack];
        }
-       else
-           answ = SCPI::scpiAnswer[SCPI::nak];
     }
-    else
-        answ = SCPI::scpiAnswer[SCPI::nak];
 
     protoCmd->m_sOutput = answ;
 }

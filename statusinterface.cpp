@@ -42,7 +42,7 @@ void cStatusInterface::executeCommand(int cmdCode, cProtonetCommand *protoCmd)
 
 quint16 cStatusInterface::getDeviceStatus()
 {
-    return 1; // todo return the number of available ecalc units
+    return 1; // device is present per default
 }
 
 

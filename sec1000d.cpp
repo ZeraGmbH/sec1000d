@@ -282,15 +282,19 @@ void cSEC1000dServer::SECIntHandler(int)
 
     read(pipeFD[0], buf, 1); // first we read the pipe
 
-    int n = m_ECalculatorChannelList.count();
-    QByteArray interruptREGS(n, 0);
+    int n = m_ECalculatorChannelList.count(); // the number of error calculator entities
+    // 8 error calc entities share 1 32 bit data word for interrupts
 
-    lseek(DevFileDescriptor,m_pECalcSettings->getIrqAdress(),0);
-    read(DevFileDescriptor,interruptREGS.data(), n);
+    n /= 2; // so we have to read 4 bytes for 8 entities -> (/ 2)
+    QByteArray interruptREGS(n, 0);
+    // first word is interrupt collection word
+    lseek(DevFileDescriptor, m_pECalcSettings->getIrqAdress()+4, 0); // so the dedicated words have +4 offset
+    read(DevFileDescriptor, interruptREGS.data(), n);
 
     for (int i = 0; i < n; i++)
     {
         quint8 irq = interruptREGS[i];
-        m_ECalculatorChannelList.at(i)->setIntReg(irq); // this will cause notifier to be thrown
+        m_ECalculatorChannelList.at(i*2)->setIntReg((irq >> 4) & 0xF); // this will cause notifier to be thrown
+        m_ECalculatorChannelList.at(i*2+1)->setIntReg(irq & 0xF);
     }
 }

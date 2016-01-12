@@ -22,7 +22,7 @@ void cInputInterface::initSCPIConnection(QString leadingNodes, cSCPI *scpiInterf
 
     for (int i = 0; i < m_pInputSettings->count(); i++ )
     {
-        delegate = new cSCPIDelegate(QString("%1INPUT:%2").arg(leadingNodes).arg(m_pInputSettings->getList().at(i).m_sName),"MUX", SCPI::isQuery, scpiInterface, InputSystem::cmdChannelMux);
+        delegate = new cSCPIDelegate(QString("%1INPUT:%2").arg(leadingNodes).arg(m_pInputSettings->getList().at(i).m_sName),"MUX", SCPI::isQuery, scpiInterface, InputSystem::cmdChannelMux + i);
         m_DelegateList.append(delegate);
         connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
     }

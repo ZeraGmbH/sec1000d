@@ -54,7 +54,7 @@ void cInputSettings::configXMLInfo(QString key)
             for (int i = 0; i < m_nCount; i++)
             {
                 m_ConfigXMLMap[QString("sec1000dconfig:connectivity:inputs:inp%1:name").arg(i+1)] = InputSettings::setinputname1+i;
-                m_ConfigXMLMap[QString("sec1000dconfig:connectivity:inputs:inp%1:muxer").arg(i+1)] = InputSettings::setinputname1+i;
+                m_ConfigXMLMap[QString("sec1000dconfig:connectivity:inputs:inp%1:muxer").arg(i+1)] = InputSettings::setinputmuxer1+i;
                 inputInfoList.append(iInfo);
             }
         }

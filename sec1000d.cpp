@@ -22,10 +22,12 @@
 #include "ethsettings.h"
 #include "fpgasettings.h"
 #include "ecalcsettings.h"
+#include "inputsettings.h"
 #include "statusinterface.h"
 #include "systeminterface.h"
 #include "systeminfo.h"
 #include "ecalcinterface.h"
+#include "inputinterface.h"
 #include "rmconnection.h"
 
 
@@ -53,9 +55,11 @@ cSEC1000dServer::cSEC1000dServer(QObject *parent)
     m_pETHSettings = 0;
     m_pFPGAsettings = 0;
     m_pECalcSettings = 0;
+    m_pInputSettings = 0;
     m_pStatusInterface = 0;
     m_pSystemInterface = 0;
     m_pECalculatorInterface = 0;
+    m_pInputInterface = 0;
     m_pSystemInfo = 0;
     m_pRMConnection = 0;
 
@@ -96,9 +100,11 @@ cSEC1000dServer::~cSEC1000dServer()
     if (m_pETHSettings) delete m_pETHSettings;
     if (m_pFPGAsettings) delete m_pFPGAsettings;
     if (m_pECalcSettings) delete m_pECalcSettings;
+    if (m_pInputSettings) delete m_pInputSettings;
     if (m_pStatusInterface) delete m_pStatusInterface;
     if (m_pSystemInterface) delete m_pSystemInterface;
     if (m_pECalculatorInterface) delete m_pECalculatorInterface;
+    if (m_pInputInterface) delete m_pInputInterface;
     if (m_pSystemInfo) delete m_pSystemInfo;
     if (m_pRMConnection) delete m_pRMConnection;
 
@@ -142,6 +148,8 @@ void cSEC1000dServer::doConfiguration()
                 connect(myXMLConfigReader,SIGNAL(valueChanged(const QString&)),m_pFPGAsettings,SLOT(configXMLInfo(const QString&)));
                 m_pECalcSettings = new cECalculatorSettings(myXMLConfigReader);
                 connect(myXMLConfigReader,SIGNAL(valueChanged(const QString&)),m_pECalcSettings,SLOT(configXMLInfo(const QString&)));
+                m_pInputSettings = new cInputSettings(myXMLConfigReader);
+                connect(myXMLConfigReader,SIGNAL(valueChanged(const QString&)),m_pInputSettings,SLOT(configXMLInfo(const QString&)));
 
                 QString s = args.at(1);
                 qDebug() << s;
@@ -178,6 +186,7 @@ void cSEC1000dServer::doSetupServer()
     scpiConnectionList.append(m_pStatusInterface = new cStatusInterface());
     scpiConnectionList.append(m_pSystemInterface = new cSystemInterface(this, m_pSystemInfo));
     scpiConnectionList.append(m_pECalculatorInterface = new cECalculatorInterface(this, m_pETHSettings, m_pECalcSettings, m_pFPGAsettings));
+    scpiConnectionList.append(m_pInputInterface = new cInputInterface(m_pInputSettings));
 
     resourceList.append(m_pECalculatorInterface); // all our resources
     m_ECalculatorChannelList = m_pECalculatorInterface->getECalcChannelList(); // we use this list in interrupt service

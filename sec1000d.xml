@@ -2,29 +2,46 @@
 
 <sec1000dconfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-	<connectivity>
-		<debuglevel>0</debuglevel>
-		<ethernet>
-			<ipadress>
-                                <resourcemanager>127.0.0.1</resourcemanager>
-			</ipadress>	
-			<port>
-                                <server>6305</server>
-				<resourcemanager>6312</resourcemanager>
-			</port>
-		</ethernet>
-		<fpga>
-			<device> 
-				<node>/dev/zFPGA1reg</node>
-			</device>
-		</fpga>		
-	</connectivity>
-	
-	<resource>
-                <ecalcchannel>
-			<n>8</n>
-			<base>0</base>
-                        <irqbase>1000</irqbase>
-                </ecalcchannel>
-	</resource>
+    <connectivity>
+        <debuglevel>0</debuglevel>
+        <ethernet>
+            <ipadress>
+                <resourcemanager>127.0.0.1</resourcemanager>
+            </ipadress>
+            <port>
+                <server>6305</server>
+                <resourcemanager>6312</resourcemanager>
+            </port>
+        </ethernet>
+        <fpga>
+            <device>
+                <node>/dev/zFPGA1reg</node>
+            </device>
+        </fpga>
+        <inputs>
+            <n>3</n>
+            <inp1>
+                <name>sh0</name>
+                <muxer>1</muxer>
+            </inp1>
+            <inp2>
+                <name>fi0</name>
+                <muxer>2</muxer>
+            </inp2>
+            <inp3>
+                <name>fo0</name>
+                <muxer>4</muxer>
+            </inp3>
+        </inputs>
+    </connectivity>
+
+    <resource>
+        <ecalcchannel>
+            <n>8</n>
+            <base>0</base>
+            <irqbase>1000</irqbase>
+        </ecalcchannel>
+    </resource>
+
 </sec1000dconfig>
+

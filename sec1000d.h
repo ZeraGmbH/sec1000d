@@ -15,10 +15,12 @@ class cDebugSettings;
 class cFPGASettings;
 class cETHSettings;
 class cECalculatorSettings;
+class cInputSettings;
 class cStatusInterface;
 class cSystemInterface;
 class cECalculatorInterface;
 class cECalculatorChannel;
+class cInputInterface;
 class cSystemInfo;
 class cRMConnection;
 
@@ -35,10 +37,12 @@ public:
     cFPGASettings* m_pFPGAsettings;
     cETHSettings* m_pETHSettings;
     cECalculatorSettings* m_pECalcSettings;
+    cInputSettings* m_pInputSettings;
 
     cStatusInterface* m_pStatusInterface;
     cSystemInterface* m_pSystemInterface;
     cECalculatorInterface* m_pECalculatorInterface;
+    cInputInterface* m_pInputInterface;
     cSystemInfo* m_pSystemInfo;
     cRMConnection* m_pRMConnection;
 

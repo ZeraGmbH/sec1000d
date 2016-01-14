@@ -20,7 +20,6 @@ class cStatusInterface;
 class cSystemInterface;
 class cECalculatorInterface;
 class cECalculatorChannel;
-class cInputInterface;
 class cSystemInfo;
 class cRMConnection;
 
@@ -42,7 +41,6 @@ public:
     cStatusInterface* m_pStatusInterface;
     cSystemInterface* m_pSystemInterface;
     cECalculatorInterface* m_pECalculatorInterface;
-    cInputInterface* m_pInputInterface;
     cSystemInfo* m_pSystemInfo;
     cRMConnection* m_pRMConnection;
 

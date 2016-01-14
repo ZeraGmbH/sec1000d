@@ -44,8 +44,7 @@ HEADERS	+= \
     ecalcinterface.h \
     ecalcchannel.h \
     notificationvalue.h \
-    inputsettings.h \
-    inputinterface.h
+    inputsettings.h
 
 SOURCES	+= \
     main.cpp \
@@ -67,8 +66,7 @@ SOURCES	+= \
     ecalcinterface.cpp \
     ecalcchannel.cpp \
     notificationvalue.cpp \
-    inputsettings.cpp \
-    inputinterface.cpp
+    inputsettings.cpp
 
 unix {
   UI_DIR = .ui

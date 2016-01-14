@@ -11,12 +11,13 @@
 #include "scpiconnection.h"
 #include "ecalcchannel.h"
 #include "fpgasettings.h"
+#include "inputsettings.h"
 #include "protonetcommand.h"
 
 extern void SigHandler(int);
 
-cECalculatorChannel::cECalculatorChannel(cSEC1000dServer* server, cECalculatorSettings* esettings, cFPGASettings* fsettings, quint16 nr)
-    :m_pMyServer(server), m_pecalcsettings(esettings), m_pfpgasettings(fsettings), m_nNr(nr)
+cECalculatorChannel::cECalculatorChannel(cSEC1000dServer* server, cECalculatorSettings* esettings, cFPGASettings* fsettings, cInputSettings *inpsettings, quint16 nr)
+    :m_pMyServer(server), m_pecalcsettings(esettings), m_pfpgasettings(fsettings), m_pInputSettings(inpsettings), m_nNr(nr)
 {
     m_nBaseAdress = m_pecalcsettings->getBaseAdress();
     m_nMyAdress = m_nBaseAdress + (nr << 4);
@@ -255,17 +256,16 @@ void cECalculatorChannel::m_setMux(cProtonetCommand *protoCmd)
         if (protoCmd->m_clientId == m_ClientId) // authorized ?
         {
             bool ok;
-            quint32 muxIndex;
             QString par;
             par = cmd.getParam(0);
             answ = SCPI::scpiAnswer[SCPI::errval]; // preset
-            muxIndex = par.toULong(&ok);
-            if (ok && (muxIndex < 32) )
+
+            if (m_pInputSettings->hasInput(par))
             {
                 quint32 reg;
                 lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (ECALCREG::CONF << 2), 0);
                 read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
-                reg = (reg & 0xFFFF83FF) | muxIndex;
+                reg = (reg & 0xFFFF83FF) | m_pInputSettings->mux(par);
                 write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
                 answ = SCPI::scpiAnswer[SCPI::ack];
             }

@@ -16,8 +16,8 @@
 #include "protonetcommand.h"
 
 
-cECalculatorInterface::cECalculatorInterface(cSEC1000dServer* server, cETHSettings* ethsettings, cECalculatorSettings* ecalcSettings, cFPGASettings* fpgasettings)
-    : m_pMyServer(server), m_pETHsettings(ethsettings), m_pecalcsettings(ecalcSettings), m_pfpgasettings(fpgasettings)
+cECalculatorInterface::cECalculatorInterface(cSEC1000dServer* server, cETHSettings* ethsettings, cECalculatorSettings* ecalcSettings, cFPGASettings* fpgasettings, cInputSettings *inputsettings)
+    : m_pMyServer(server), m_pETHsettings(ethsettings), m_pecalcsettings(ecalcSettings), m_pfpgasettings(fpgasettings), m_pInputSettings(inputsettings)
 {
     m_sVersion = ECalcSystem::Version;
 
@@ -25,7 +25,7 @@ cECalculatorInterface::cECalculatorInterface(cSEC1000dServer* server, cETHSettin
     int n = m_pecalcsettings->getNumber();
     for (int i = 0; i < n; i++ )
     {
-        cECalculatorChannel* eChan = new cECalculatorChannel(m_pMyServer, m_pecalcsettings, m_pfpgasettings, i);
+        cECalculatorChannel* eChan = new cECalculatorChannel(m_pMyServer, m_pecalcsettings, m_pfpgasettings, m_pInputSettings, i);
         m_ECalculatorChannelList.append(eChan); // we have a list for seq. access
         m_ECalculatorChannelHash[eChan->getName()] = eChan; // and a hash for access by channel nam3
     }

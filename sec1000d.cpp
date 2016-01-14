@@ -27,9 +27,7 @@
 #include "systeminterface.h"
 #include "systeminfo.h"
 #include "ecalcinterface.h"
-#include "inputinterface.h"
 #include "rmconnection.h"
-
 
 
 cSEC1000dServer* SECServer;
@@ -59,7 +57,6 @@ cSEC1000dServer::cSEC1000dServer(QObject *parent)
     m_pStatusInterface = 0;
     m_pSystemInterface = 0;
     m_pECalculatorInterface = 0;
-    m_pInputInterface = 0;
     m_pSystemInfo = 0;
     m_pRMConnection = 0;
 
@@ -104,7 +101,6 @@ cSEC1000dServer::~cSEC1000dServer()
     if (m_pStatusInterface) delete m_pStatusInterface;
     if (m_pSystemInterface) delete m_pSystemInterface;
     if (m_pECalculatorInterface) delete m_pECalculatorInterface;
-    if (m_pInputInterface) delete m_pInputInterface;
     if (m_pSystemInfo) delete m_pSystemInfo;
     if (m_pRMConnection) delete m_pRMConnection;
 
@@ -185,8 +181,7 @@ void cSEC1000dServer::doSetupServer()
     scpiConnectionList.append(this); // the server itself has some commands
     scpiConnectionList.append(m_pStatusInterface = new cStatusInterface());
     scpiConnectionList.append(m_pSystemInterface = new cSystemInterface(this, m_pSystemInfo));
-    scpiConnectionList.append(m_pECalculatorInterface = new cECalculatorInterface(this, m_pETHSettings, m_pECalcSettings, m_pFPGAsettings));
-    scpiConnectionList.append(m_pInputInterface = new cInputInterface(m_pInputSettings));
+    scpiConnectionList.append(m_pECalculatorInterface = new cECalculatorInterface(this, m_pETHSettings, m_pECalcSettings, m_pFPGAsettings, m_pInputSettings));
 
     resourceList.append(m_pECalculatorInterface); // all our resources
     m_ECalculatorChannelList = m_pECalculatorInterface->getECalcChannelList(); // we use this list in interrupt service

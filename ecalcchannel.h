@@ -38,6 +38,7 @@ enum Commands
 class cSEC1000dServer;
 class cECalculatorSettings;
 class cFPGASettings;
+class cInputSettings;
 class cProtonetCommand;
 
 class cECalculatorChannel : public cSCPIConnection
@@ -45,7 +46,7 @@ class cECalculatorChannel : public cSCPIConnection
     Q_OBJECT
 
 public:
-    cECalculatorChannel(cSEC1000dServer* server, cECalculatorSettings* esettings, cFPGASettings* fsettings, quint16 nr);
+    cECalculatorChannel(cSEC1000dServer* server, cECalculatorSettings* esettings, cFPGASettings* fsettings, cInputSettings* inpsettings, quint16 nr);
     ~cECalculatorChannel();
     virtual void initSCPIConnection(QString leadingNodes, cSCPI *scpiInterface);
 
@@ -63,6 +64,7 @@ private:
     cSEC1000dServer* m_pMyServer;
     cECalculatorSettings* m_pecalcsettings;
     cFPGASettings* m_pfpgasettings;
+    cInputSettings* m_pInputSettings;
     quint16 m_nNr;
     quint32 m_nBaseAdress;
     quint32 m_nMyAdress;

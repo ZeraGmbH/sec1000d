@@ -41,9 +41,7 @@ class cInputSettings : public cXMLSettings
 public:
     cInputSettings(Zera::XMLConfig::cReader *xmlread);
 
-    quint16 count();
-    QList<cInputInfo>& getList();
-    QString nameList();
+    bool hasInput(QString name);
     qint8 mux(QString name);
 
 public slots:
@@ -51,7 +49,8 @@ public slots:
 
 private:
     quint16 m_nCount;
-    QList<cInputInfo> inputInfoList;
+    QString actName;
+    QHash<QString, quint8> muxInfoHash;
 };
 
 #endif // INPUTSETTINGS

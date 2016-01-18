@@ -167,7 +167,6 @@ QString cECalculatorInterface::m_ReadECalculatorChannelCatalog(QString &sInput)
 void cECalculatorInterface::m_SetChannels(cProtonetCommand *protoCmd)
 {
     cSCPICommand cmd = protoCmd->m_sInput;
-    QString answ;
 
     if (cmd.isCommand(1))
     {
@@ -193,31 +192,29 @@ void cECalculatorInterface::m_SetChannels(cProtonetCommand *protoCmd)
            }
            if (n == 0)
            {
-               answ = s;
+               protoCmd->m_sOutput = s;
                QByteArray id = protoCmd->m_clientId;
                m_ClientECalcHash[id] = s;
                for (int i = 0; i < selEChannels.count(); i++)
                    selEChannels.at(i)->set(id);
            }
            else
-               answ = SCPI::scpiAnswer[SCPI::busy];
+               protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::busy];
        }
        else
-           answ = SCPI::scpiAnswer[SCPI::nak];
+           protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::nak];
     }
     else
-        answ = SCPI::scpiAnswer[SCPI::nak];
+        protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::nak];
 
-    protoCmd->m_sOutput = answ;
 }
 
 
 void cECalculatorInterface::m_FreeChannels(cProtonetCommand *protoCmd)
 {
     cSCPICommand cmd = protoCmd->m_sInput;
-    QString answ;
 
-    answ = SCPI::scpiAnswer[SCPI::nak]; // preset
+    protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::nak]; // preset
 
     if (cmd.isCommand(0))
     {
@@ -231,11 +228,9 @@ void cECalculatorInterface::m_FreeChannels(cProtonetCommand *protoCmd)
                if (m_ECalculatorChannelHash.contains(key))
                    m_ECalculatorChannelHash[key]->free();
            }
-           answ = SCPI::scpiAnswer[SCPI::ack];
+           protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::ack];
        }
     }
-
-    protoCmd->m_sOutput = answ;
 }
 
 

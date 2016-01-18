@@ -22,15 +22,15 @@
             <n>3</n>
             <inp1>
                 <name>sh0</name>
-                <muxer>1</muxer>
+                <muxer>5</muxer>
             </inp1>
             <inp2>
                 <name>fi0</name>
-                <muxer>2</muxer>
+                <muxer>0</muxer>
             </inp2>
             <inp3>
                 <name>fo0</name>
-                <muxer>4</muxer>
+                <muxer>27</muxer>
             </inp3>
         </inputs>
     </connectivity>

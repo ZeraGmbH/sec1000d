@@ -20,7 +20,7 @@ cECalculatorChannel::cECalculatorChannel(cSEC1000dServer* server, cECalculatorSe
     :m_pMyServer(server), m_pecalcsettings(esettings), m_pfpgasettings(fsettings), m_pInputSettings(inpsettings), m_nNr(nr)
 {
     m_nBaseAdress = m_pecalcsettings->getBaseAdress();
-    m_nMyAdress = m_nBaseAdress + (nr << 5);
+    m_nMyAdress = m_nBaseAdress + (nr << 6);
     m_sName = QString("%1%2").arg(baseChnName).arg(nr);
     m_bSet = false;
     setNotifierECalcChannelIntReg();

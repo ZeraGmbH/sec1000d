@@ -32,7 +32,7 @@
     <xs:simpleType name="muxertype">
         <xs:restriction base="xs:integer">
             <xs:maxInclusive value='31'/>
-            <xs:minExclusive value='0'/>
+            <xs:minInclusive value='0'/>
         </xs:restriction>
     </xs:simpleType>
 

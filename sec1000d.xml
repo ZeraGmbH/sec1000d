@@ -15,7 +15,7 @@
         </ethernet>
         <fpga>
             <device>
-                <node>/dev/zFPGA1reg</node>
+                <node>/dev/zFPGA1ec</node>
             </device>
         </fpga>
         <inputs>

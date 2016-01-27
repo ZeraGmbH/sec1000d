@@ -252,7 +252,6 @@ void cECalculatorChannel::m_setMux(cProtonetCommand *protoCmd)
     {
         if (protoCmd->m_clientId == m_ClientId) // authorized ?
         {
-            bool ok;
             QString par;
             par = cmd.getParam(0);
             protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::errval]; // preset
@@ -262,7 +261,7 @@ void cECalculatorChannel::m_setMux(cProtonetCommand *protoCmd)
                 quint32 reg;
                 lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (ECALCREG::CONF << 2), 0);
                 read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
-                reg = (reg & 0xFFFF83FF) | m_pInputSettings->mux(par);
+                reg = (reg & 0xFFFF83FF) | (m_pInputSettings->mux(par) << 10);
                 write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
                 protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::ack];
             }

@@ -34,14 +34,12 @@ cECalculatorInterface::cECalculatorInterface(cSEC1000dServer* server, cETHSettin
 
 cECalculatorInterface::~cECalculatorInterface()
 {
-    QList<cECalculatorChannel*> ecList;
-    ecList = m_ECalculatorChannelHash.values();
     cECalculatorChannel* cptr;
 
-    int n = ecList.count();
+    int n = m_ECalculatorChannelList.count();
     for (int i = 0; n; i++)
     {
-        cptr = ecList.at(i);
+        cptr = m_ECalculatorChannelList.at(i);
         delete cptr;
     }
 }
@@ -67,16 +65,14 @@ void cECalculatorInterface::initSCPIConnection(QString leadingNodes, cSCPI* scpi
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
 
-    QList<cECalculatorChannel*> ecList;
-    ecList = m_ECalculatorChannelHash.values();
-    int n = ecList.count();
+    int n = m_ECalculatorChannelList.count();
     for (int i = 0; i < n; i++)
     {
         // we also must connect the signals for notification and for output
-        connect(ecList.at(i), SIGNAL(notifier(cNotificationValue*)), this, SIGNAL(notifier(cNotificationValue*)));
-        connect(ecList.at(i), SIGNAL(cmdExecutionDone(cProtonetCommand*)), this, SIGNAL(cmdExecutionDone(cProtonetCommand*)));
+        connect(m_ECalculatorChannelList.at(i), SIGNAL(notifier(cNotificationValue*)), this, SIGNAL(notifier(cNotificationValue*)));
+        connect(m_ECalculatorChannelList.at(i), SIGNAL(cmdExecutionDone(cProtonetCommand*)), this, SIGNAL(cmdExecutionDone(cProtonetCommand*)));
 
-        ecList.at(i)->initSCPIConnection(QString("%1ECALCULATOR").arg(leadingNodes),scpiInterface);
+        m_ECalculatorChannelList.at(i)->initSCPIConnection(QString("%1ECALCULATOR").arg(leadingNodes),scpiInterface);
     }
 }
 
@@ -151,11 +147,9 @@ QString cECalculatorInterface::m_ReadECalculatorChannelCatalog(QString &sInput)
     if (cmd.isQuery())
     {
         QString s;
-        QList<cECalculatorChannel*> ecList;
-        ecList = m_ECalculatorChannelHash.values();
-        int n = ecList.count();
+        int n = m_ECalculatorChannelList.count();
         for (int i = 0; i < n; i++)
-            s += QString("%1;").arg(ecList.at(i)->getName());
+            s += QString("%1;").arg(m_ECalculatorChannelList.at(i)->getName());
 
         return s;
     }
@@ -175,16 +169,15 @@ void cECalculatorInterface::m_SetChannels(cProtonetCommand *protoCmd)
        if (ok && (n > 0) && (n < 5)) // we accept 1 .. 4 ecalc requests
        {
            QString s;
-           QList<cECalculatorChannel*> ecList;
            QList<cECalculatorChannel*> selEChannels;
-           ecList = m_ECalculatorChannelHash.values();
-           int m = ecList.count();
+
+           int m = m_ECalculatorChannelList.count();
            for (int i = 0; i < m; i++)
            {
-               if (ecList.at(i)->isfree())
+               if (m_ECalculatorChannelList.at(i)->isfree())
                {
-                   selEChannels.append(ecList.at(i));
-                   s += QString("%1;").arg(ecList.at(i)->getName());
+                   selEChannels.append(m_ECalculatorChannelList.at(i));
+                   s += QString("%1;").arg(m_ECalculatorChannelList.at(i)->getName());
                    n--;
                }
                if (n == 0)

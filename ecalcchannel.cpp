@@ -231,7 +231,7 @@ void cECalculatorChannel::m_setSync(cProtonetCommand *protoCmd)
                     quint32 reg;
                     lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (ECALCREG::CONF << 2), 0);
                     read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
-                    reg = (reg & 0xFFFFFF00) | chnIndex;
+                    reg = (reg & 0xFFFFFF00) | (chnIndex+1);
                     write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
                     protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::ack];
                 }

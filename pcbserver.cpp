@@ -194,6 +194,7 @@ void cPCBServer::m_RegisterNotifier(cProtonetCommand *protoCmd)
 
             cSCPIDelegate* scpiDelegate = static_cast<cSCPIDelegate*>(scpiObject);
             cProtonetCommand* procmd = new cProtonetCommand(protoCmd);
+            procmd->m_nSCPIType = SCPI::isQuery; // we need to set query type for proper execution
             procmd->m_bwithOutput = false;
             procmd->m_sInput = query;
 

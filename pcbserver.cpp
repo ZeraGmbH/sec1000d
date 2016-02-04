@@ -279,7 +279,7 @@ void cPCBServer::executeCommand(google::protobuf::Message* cmd)
             if (protobufCommand->has_netcommand())
             {
                 // in case of "lost" clients we delete registration for notification
-                cProtonetCommand* protoCmd = new cProtonetCommand(peer, true, true, clientId, 0, "");
+                cProtonetCommand* protoCmd = new cProtonetCommand(peer, true, true, clientId, 0, "", 0);
                 doUnregisterNotifier(protoCmd);
             }
 
@@ -290,9 +290,12 @@ void cPCBServer::executeCommand(google::protobuf::Message* cmd)
                 quint32 messageNr = protobufCommand->messagenr();
                 ProtobufMessage::NetMessage::ScpiCommand scpiCmd = protobufCommand->scpi();
                 m_sInput = QString::fromStdString(scpiCmd.command()) +  " " + QString::fromStdString(scpiCmd.parameter());
-                cProtonetCommand* protoCmd = new cProtonetCommand(peer, true, true, clientId, messageNr, m_sInput);
+
+                cProtonetCommand* protoCmd;
+
                 if ( (scpiObject =  m_pSCPInterface->getSCPIObject(m_sInput, dummy)) != 0)
                 {
+                    protoCmd = new cProtonetCommand(peer, true, true, clientId, messageNr, m_sInput, scpiObject->getType());
                     cSCPIDelegate* scpiDelegate = static_cast<cSCPIDelegate*>(scpiObject);
                     if (!scpiDelegate->executeSCPI(protoCmd))
                     {
@@ -302,6 +305,7 @@ void cPCBServer::executeCommand(google::protobuf::Message* cmd)
                 }
                 else
                 {
+                    protoCmd = new cProtonetCommand(peer, true, true, clientId, messageNr, m_sInput, 0);
                     protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::nak];
                     emit cmdExecutionDone(protoCmd);
                 }
@@ -315,9 +319,10 @@ void cPCBServer::executeCommand(google::protobuf::Message* cmd)
         {
             m_sInput =  QString::fromStdString(protobufCommand->scpi().command());
             QByteArray clientId = QByteArray(); // we set an empty byte array
-            cProtonetCommand* protoCmd = new cProtonetCommand(peer, false, true, clientId, 0, m_sInput);
+            cProtonetCommand* protoCmd;
             if ( (scpiObject =  m_pSCPInterface->getSCPIObject(m_sInput, dummy)) != 0)
             {
+                protoCmd = new cProtonetCommand(peer, false, true, clientId, 0, m_sInput, scpiObject->getType());
                 cSCPIDelegate* scpiDelegate = static_cast<cSCPIDelegate*>(scpiObject);
 
                 if (!scpiDelegate->executeSCPI(protoCmd))
@@ -329,6 +334,7 @@ void cPCBServer::executeCommand(google::protobuf::Message* cmd)
             }
             else
             {
+                protoCmd = new cProtonetCommand(peer, false, true, clientId, 0, m_sInput, 0);
                 protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::nak]+";";
                 emit cmdExecutionDone(protoCmd);
             }

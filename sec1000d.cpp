@@ -174,24 +174,6 @@ void cSEC1000dServer::doConfiguration()
 
 void cSEC1000dServer::doSetupServer()
 {
-    m_pSystemInfo = new cSystemInfo();
-
-    cPCBServer::setupServer(); // here our scpi interface gets instanciated, we need this for further steps
-
-    scpiConnectionList.append(this); // the server itself has some commands
-    scpiConnectionList.append(m_pStatusInterface = new cStatusInterface());
-    scpiConnectionList.append(m_pSystemInterface = new cSystemInterface(this, m_pSystemInfo));
-    scpiConnectionList.append(m_pECalculatorInterface = new cECalculatorInterface(this, m_pETHSettings, m_pECalcSettings, m_pFPGAsettings, m_pInputSettings));
-
-    resourceList.append(m_pECalculatorInterface); // all our resources
-    m_ECalculatorChannelList = m_pECalculatorInterface->getECalcChannelList(); // we use this list in interrupt service
-
-    SECServer = this;
-    m_nDebugLevel = m_pDebugSettings->getDebugLevel();
-
-    initSCPIConnections();
-
-    myServer->startServer(m_pETHSettings->getPort(server)); // and can start the server now
 
     m_sSECDeviceNode = m_pFPGAsettings->getDeviceNode(); // we try to open the sec device
 
@@ -202,6 +184,25 @@ void cSEC1000dServer::doSetupServer()
     }
     else
     {
+        m_pSystemInfo = new cSystemInfo();
+
+        cPCBServer::setupServer(); // here our scpi interface gets instanciated, we need this for further steps
+
+        scpiConnectionList.append(this); // the server itself has some commands
+        scpiConnectionList.append(m_pStatusInterface = new cStatusInterface());
+        scpiConnectionList.append(m_pSystemInterface = new cSystemInterface(this, m_pSystemInfo));
+        scpiConnectionList.append(m_pECalculatorInterface = new cECalculatorInterface(this, m_pETHSettings, m_pECalcSettings, m_pFPGAsettings, m_pInputSettings));
+
+        resourceList.append(m_pECalculatorInterface); // all our resources
+        m_ECalculatorChannelList = m_pECalculatorInterface->getECalcChannelList(); // we use this list in interrupt service
+
+        SECServer = this;
+        m_nDebugLevel = m_pDebugSettings->getDebugLevel();
+
+        initSCPIConnections();
+
+        myServer->startServer(m_pETHSettings->getPort(server)); // and can start the server now
+
         mySigAction.sa_handler = &SigHandler; // signal handler einrichten
         sigemptyset(&mySigAction.sa_mask);
         mySigAction. sa_flags = SA_RESTART;

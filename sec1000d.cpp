@@ -299,7 +299,7 @@ void cSEC1000dServer::SECIntHandler(int)
     for (int i = 0; i < n; i++)
     {
         quint8 irq = interruptREGS[i];
-        m_ECalculatorChannelList.at(i*2)->setIntReg((irq >> 4) & 0xF); // this will cause notifier to be thrown
-        m_ECalculatorChannelList.at(i*2+1)->setIntReg(irq & 0xF);
+        m_ECalculatorChannelList.at(i*2)->setIntReg(irq & 0xF); // this will cause notifier to be thrown
+        m_ECalculatorChannelList.at(i*2+1)->setIntReg((irq >> 4) & 0xF);
     }
 }

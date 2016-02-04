@@ -12,8 +12,8 @@ public:
     cNotificationValue();
     cNotificationValue(quint32 val);
     quint32 getValue();
-    void operator = (quint32 val);
     void setValue(quint32 val); // emits no signal
+    void clrValue(quint32 val);
 
 signals:
     void risingEdge(quint32);

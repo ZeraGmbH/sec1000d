@@ -38,7 +38,40 @@ void cECalculatorChannel::initSCPIConnection(QString leadingNodes, cSCPI *scpiIn
     if (leadingNodes != "")
         leadingNodes += ":";
 
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"REGISTER", SCPI::isCmdwP, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::CMD), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    m_DelegateList.append(delegate);
+    connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::CONF), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    m_DelegateList.append(delegate);
+    connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::STATUS), SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    m_DelegateList.append(delegate);
+    connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::INTMASK), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    m_DelegateList.append(delegate);
+    connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::INTREG), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    m_DelegateList.append(delegate);
+    connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTCNTin), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    m_DelegateList.append(delegate);
+    connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTCNTfin), SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    m_DelegateList.append(delegate);
+    connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTCNTact), SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    m_DelegateList.append(delegate);
+    connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPULSin), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    m_DelegateList.append(delegate);
+    connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPAUSEin), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    m_DelegateList.append(delegate);
+    connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPULS), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    m_DelegateList.append(delegate);
+    connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPAUSE), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
     delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"SYNC", SCPI::isCmdwP, scpiInterface, ECalcChannel::setSync);
@@ -131,72 +164,58 @@ void cECalculatorChannel::setIntReg(quint8 reg)
 
 void cECalculatorChannel::m_ReadWriteRegister(cProtonetCommand *protoCmd)
 {
-    bool ok1,ok2;
-    cSCPICommand cmd = protoCmd->m_sInput;
     QString par;
+    bool ok;
     quint8 regInd;
     quint32 reg;
 
-    if (cmd.isQuery(1))
+    cSCPICommand cmd = protoCmd->m_sInput;
+    par = protoCmd->m_sInput.section(':',2,2);
+    par.remove(QChar('r'), Qt::CaseInsensitive);
+    par.remove(QChar('?'));
+    regInd = par.toInt(&ok);
+
+    if ( ((protoCmd->m_nSCPIType & SCPI::isQuery) != 0) && cmd.isQuery() )
     {
-        par = cmd.getParam(0);
-        regInd = par.toInt(&ok1);
-        if (ok1)
+        switch (regInd)
         {
-            switch (regInd)
-            {
-                case ECALCREG::CMD:
-                case ECALCREG::CONF:
-                case ECALCREG::STATUS:
-                case ECALCREG::INTMASK:
-                case ECALCREG::MTCNTin:
-                case ECALCREG::MTCNTact:
-                case ECALCREG::MTPULSin:
-                case ECALCREG::MTPAUSEin:
-                case ECALCREG::MTPULS:
-                case ECALCREG::MTPAUSE:
-                    lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (regInd << 2), 0);
-                    read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
-                    protoCmd->m_sOutput =  QString("%1").arg(reg);
-                    break;
-                case ECALCREG::INTREG:
-                    emit notifier(&notifierECalcChannelIntReg);
-                    protoCmd->m_sOutput =  QString("%1").arg(notifierECalcChannelIntReg.getValue()); // we only return the notifiers value
-                    break;
-                default:
-                    protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::nak];
-            }
+            case ECALCREG::INTREG:
+                emit notifier(&notifierECalcChannelIntReg);
+                protoCmd->m_sOutput =  QString("%1").arg(notifierECalcChannelIntReg.getValue()); // we only return the notifiers value
+                break;
+
+            //case ECALCREG::CMD:
+            //case ECALCREG::CONF:
+            //case ECALCREG::STATUS:
+            //case ECALCREG::INTMASK:
+            //case ECALCREG::MTCNTin:
+            //case ECALCREG::MTCNTfin:
+            //case ECALCREG::MTCNTact:
+            //case ECALCREG::MTPULSin:
+            //case ECALCREG::MTPAUSEin:
+            //case ECALCREG::MTPULS:
+            //case ECALCREG::MTPAUSE:
+
+            default:
+            lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (regInd << 2), 0);
+            read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
+            protoCmd->m_sOutput =  QString("%1").arg(reg);
         }
     }
+
     else
-        if (cmd.isCommand(2))
+
+        if ( ((protoCmd->m_nSCPIType & SCPI::isCmdwP) !=0) && cmd.isCommand(1) )
         {
             if (protoCmd->m_clientId == m_ClientId) // authorized ?
             {
                 par = cmd.getParam(0);
-                regInd = par.toInt(&ok1);
-                par = cmd.getParam(1);
-                reg = par.toULong(&ok2);
-                if (ok1 && ok2)
+                reg = par.toULong(&ok);
+                if (ok)
                 {
-                    switch (regInd)
-                    {
-                        case ECALCREG::CMD:
-                        case ECALCREG::CONF:
-                        case ECALCREG::INTMASK:
-                        case ECALCREG::MTCNTin:
-                        case ECALCREG::MTCNTact:
-                        case ECALCREG::MTPULSin:
-                        case ECALCREG::MTPAUSEin:
-                        case ECALCREG::MTPULS:
-                        case ECALCREG::MTPAUSE:
-                            lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (regInd << 2), 0);
-                            write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
-                            protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::ack];
-                            break;
-                        default:
-                            protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::nak];
-                    }
+                    lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (regInd << 2), 0);
+                    write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
+                    protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::ack];
                 }
                 else
                     protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::nak];
@@ -204,7 +223,9 @@ void cECalculatorChannel::m_ReadWriteRegister(cProtonetCommand *protoCmd)
             else
                 protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::erraut];
         }
+
         else
+
             protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::nak];
 }
 

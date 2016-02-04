@@ -164,13 +164,14 @@ void cECalculatorChannel::setIntReg(quint8 reg)
 
 void cECalculatorChannel::m_ReadWriteRegister(cProtonetCommand *protoCmd)
 {
-    QString par;
+    QString par, cmdStr;
     bool ok;
     quint8 regInd;
     quint32 reg;
 
     cSCPICommand cmd = protoCmd->m_sInput;
-    par = protoCmd->m_sInput.section(':',2,2);
+    cmdStr = cmd.getCommandStr();
+    par = cmdStr.section(':',2,2);
     par.remove(QChar('r'), Qt::CaseInsensitive);
     par.remove(QChar('?'));
     regInd = par.toInt(&ok);

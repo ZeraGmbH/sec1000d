@@ -23,7 +23,6 @@ cECalculatorChannel::cECalculatorChannel(cSEC1000dServer* server, cECalculatorSe
     m_nMyAdress = m_nBaseAdress + (nr << 6);
     m_sName = QString("%1%2").arg(baseChnName).arg(nr);
     m_bSet = false;
-    setNotifierECalcChannelIntReg();
 }
 
 
@@ -57,6 +56,9 @@ void cECalculatorChannel::initSCPIConnection(QString leadingNodes, cSCPI *scpiIn
     delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"STOP", SCPI::isCmdwP, scpiInterface, ECalcChannel::stop);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"INTACK", SCPI::isCmdwP, scpiInterface, ECalcChannel::intAcknowledge);
+    m_DelegateList.append(delegate);
+    connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
 }
 
 
@@ -81,6 +83,9 @@ void cECalculatorChannel::executeCommand(int cmdCode, cProtonetCommand *protoCmd
         break;
     case ECalcChannel::stop:
         m_stop(protoCmd);
+        break;
+    case ECalcChannel::intAcknowledge:
+        m_resetInt(protoCmd);
         break;
     }
 
@@ -120,7 +125,7 @@ void cECalculatorChannel::free()
 
 void cECalculatorChannel::setIntReg(quint8 reg)
 {
-    notifierECalcChannelIntReg = reg;
+    notifierECalcChannelIntReg.setValue(reg);
 }
 
 
@@ -179,7 +184,6 @@ void cECalculatorChannel::m_ReadWriteRegister(cProtonetCommand *protoCmd)
                         case ECALCREG::CMD:
                         case ECALCREG::CONF:
                         case ECALCREG::INTMASK:
-                        case ECALCREG::INTREG:
                         case ECALCREG::MTCNTin:
                         case ECALCREG::MTCNTact:
                         case ECALCREG::MTPULSin:
@@ -188,11 +192,6 @@ void cECalculatorChannel::m_ReadWriteRegister(cProtonetCommand *protoCmd)
                         case ECALCREG::MTPAUSE:
                             lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (regInd << 2), 0);
                             write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
-                            if (regInd == ECALCREG::INTREG)
-                            {
-                                notifierECalcChannelIntReg.setValue(reg);
-                                SigHandler(0); // we do so as if the interrupt handler had seen another edge
-                            }
                             protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::ack];
                             break;
                         default:
@@ -334,11 +333,7 @@ void cECalculatorChannel::m_stop(cProtonetCommand *protoCmd)
     {
         if (protoCmd->m_clientId == m_ClientId) // authorized ?
         {
-            quint32 reg;
-            lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (ECALCREG::CMD << 2), 0);
-            read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
-            reg = (reg & 0xFFFFFF3F) | 0x40;
-            write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
+            m_StopErrorCalculator();
             protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::ack];
         }
         else
@@ -349,9 +344,56 @@ void cECalculatorChannel::m_stop(cProtonetCommand *protoCmd)
 }
 
 
-void cECalculatorChannel::setNotifierECalcChannelIntReg()
+void cECalculatorChannel::m_resetInt(cProtonetCommand *protoCmd)
 {
-    notifierECalcChannelIntReg = 0; // we have no interrupt yet
+    bool ok;
+    cSCPICommand cmd = protoCmd->m_sInput;
+    QString par;
+    quint32 interrupt;
+
+    if (cmd.isCommand(1))
+    {
+        if (protoCmd->m_clientId == m_ClientId) // authorized ?
+        {
+            par = cmd.getParam(0);
+            interrupt = par.toULong(&ok);
+            if (ok)
+            {
+                m_resetInterrupt(interrupt);
+                SigHandler(0); // we do so as if the interrupt handler had seen another edge
+            }
+            else
+                protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::nak];
+        }
+        else
+            protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::erraut];
+    }
+    else
+        protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::nak];
+
+}
+
+
+void cECalculatorChannel::m_StopErrorCalculator()
+{
+    quint32 reg;
+
+    lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (ECALCREG::CMD << 2), 0);
+    read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
+    reg = (reg & 0xFFFFFF3F) | 0x40;
+    write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
+}
+
+
+void cECalculatorChannel::m_resetInterrupt(quint8 interrupt)
+{
+    quint32 reg;
+
+    notifierECalcChannelIntReg.clrValue(interrupt);
+    lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (ECALCREG::INTREG << 2), 0);
+    read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
+    reg = (reg & 0xF) & ~interrupt;
+    write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
 }
 
 

@@ -27,7 +27,10 @@ cECalculatorInterface::cECalculatorInterface(cSEC1000dServer* server, cETHSettin
     {
         cECalculatorChannel* eChan = new cECalculatorChannel(m_pMyServer, m_pecalcsettings, m_pfpgasettings, m_pInputSettings, i);
         m_ECalculatorChannelList.append(eChan); // we have a list for seq. access
-        m_ECalculatorChannelHash[eChan->getName()] = eChan; // and a hash for access by channel nam3
+        m_ECalculatorChannelHash[eChan->getName()] = eChan; // and a hash for access by channel name
+        m_ECalculatorChannelList.at(i)->m_StopErrorCalculator(); // initially we stop all ec's
+        m_ECalculatorChannelList.at(i)->m_resetInterrupt(0xF); // and reset all interrupts
+
     }
 }
 

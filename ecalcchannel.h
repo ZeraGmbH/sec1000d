@@ -30,7 +30,8 @@ enum Commands
     setMux,
     setCmdid,
     start,
-    stop
+    stop,
+    intAcknowledge
 };
 
 }
@@ -55,7 +56,10 @@ public:
     bool set(QByteArray id);
     void free();
     void setIntReg(quint8 reg);
-    void clrIntReg(quint8 reg);
+    //void clrIntReg(quint8 reg);
+
+    void m_StopErrorCalculator();
+    void m_resetInterrupt(quint8 interrupt);
 
 protected slots:
     virtual void executeCommand(int cmdCode, cProtonetCommand* protoCmd);
@@ -78,9 +82,9 @@ private:
     void m_setCmdId(cProtonetCommand* protoCmd);
     void m_start(cProtonetCommand* protoCmd);
     void m_stop(cProtonetCommand* protoCmd);
+    void m_resetInt(cProtonetCommand* protoCmd);
 
     cNotificationValue notifierECalcChannelIntReg;
-    void setNotifierECalcChannelIntReg();
 };
 
 #endif // ECALCCHANNEL_H

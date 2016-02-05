@@ -38,22 +38,22 @@ void cECalculatorChannel::initSCPIConnection(QString leadingNodes, cSCPI *scpiIn
     if (leadingNodes != "")
         leadingNodes += ":";
 
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::CMD), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::CMD), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::CONF), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::CONF), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
     delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::STATUS), SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::INTMASK), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::INTMASK), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::INTREG), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::INTREG), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTCNTin), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTCNTin), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
     delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTCNTfin), SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
@@ -62,16 +62,16 @@ void cECalculatorChannel::initSCPIConnection(QString leadingNodes, cSCPI *scpiIn
     delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTCNTact), SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPULSin), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPULSin), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPAUSEin), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPAUSEin), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPULS), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPULS), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPAUSE), SCPI::isCmdwP || SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPAUSE), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
     delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"SYNC", SCPI::isCmdwP, scpiInterface, ECalcChannel::setSync);

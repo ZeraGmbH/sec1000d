@@ -29,6 +29,9 @@
 #include "ecalcinterface.h"
 #include "rmconnection.h"
 
+#ifdef SYSTEMD_NOTIFICATION
+#include <systemd/sd-daemon.h>
+#endif
 
 cSEC1000dServer* SECServer;
 int pipeFD[2];
@@ -259,6 +262,11 @@ void cSEC1000dServer::doIdentAndRegister()
         connect(m_pRMConnection, SIGNAL(rmAck(quint32)), res, SLOT(resourceManagerAck(quint32)) );
         res->registerResource(m_pRMConnection, m_pETHSettings->getPort(server));
     }
+
+#ifdef SYSTEMD_NOTIFICATION
+    sd_notify(0, "READY=1");
+#endif
+
 }
 
 

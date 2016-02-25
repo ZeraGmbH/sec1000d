@@ -32,6 +32,18 @@
                 <name>fo0</name>
                 <muxer>27</muxer>
             </inp3>
+            <inp4>
+                <name>fo1</name>
+                <muxer>28</muxer>
+            </inp4>
+            <inp5>
+                <name>fo2</name>
+                <muxer>29</muxer>
+            </inp5>
+            <inp6>
+                <name>fo3</name>
+                <muxer>30</muxer>
+            </inp6>
         </inputs>
     </connectivity>
 

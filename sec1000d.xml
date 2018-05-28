@@ -46,7 +46,7 @@
             </inp6>
             <inp7>
                 <name>hk0</name>
-                <muxer>5</muxer>
+                <muxer>6</muxer>
             </inp7>
         </inputs>
     </connectivity>

@@ -12,7 +12,7 @@
 #include <QCoreApplication>
 #include <QSocketNotifier>
 
-#include <protonetserver.h>
+#include <xiqnetserver.h>
 #include <xmlconfigreader.h>
 
 #include "sec1000dglobal.h"

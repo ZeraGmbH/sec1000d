@@ -4,14 +4,14 @@
 #include <QByteArray>
 #include <QString>
 
-class ProtoNetPeer;
+class XiQNetPeer;
 
 class cProtonetCommand
 {
 public:
-    cProtonetCommand(ProtoNetPeer* peer, bool hasClientId, bool withOutput, QByteArray clientid, quint32 messagenr ,QString input, quint8 scpitype);
+    cProtonetCommand(XiQNetPeer* peer, bool hasClientId, bool withOutput, QByteArray clientid, quint32 messagenr ,QString input, quint8 scpitype);
     cProtonetCommand(const cProtonetCommand* protoCmd);
-    ProtoNetPeer* m_pPeer;
+    XiQNetPeer* m_pPeer;
     bool m_bhasClientId;
     bool m_bwithOutput;
     QByteArray m_clientId;

@@ -1,7 +1,7 @@
 #include "protonetcommand.h"
 
 
-cProtonetCommand::cProtonetCommand(ProtoNetPeer *peer, bool hasClientId, bool withOutput, QByteArray clientid, quint32 messagenr, QString input, quint8 scpitype)
+cProtonetCommand::cProtonetCommand(XiQNetPeer *peer, bool hasClientId, bool withOutput, QByteArray clientid, quint32 messagenr, QString input, quint8 scpitype)
     :m_pPeer(peer), m_bhasClientId(hasClientId), m_bwithOutput(withOutput), m_clientId(clientid), m_nmessageNr(messagenr), m_sInput(input), m_nSCPIType(scpitype)
 {
 }

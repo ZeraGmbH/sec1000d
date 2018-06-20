@@ -47,8 +47,8 @@ enum commands
 }
 
 class cProtonetCommand;
-class ProtoNetServer;
-class ProtoNetPeer;
+class XiQNetServer;
+class XiQNetPeer;
 class cSCPI;
 class cStatusInterface;  // forward
 
@@ -101,7 +101,7 @@ signals:
 
 protected:
     void initSCPIConnections();
-    ProtoNetServer* myServer; // the real server that does the communication job
+    XiQNetServer* myServer; // the real server that does the communication job
     cSec1000dProtobufWrapper m_ProtobufWrapper;
     Zera::XMLConfig::cReader* myXMLConfigReader; // the xml configurator
     QString m_sConfigurationPath;
@@ -137,8 +137,8 @@ private:
     quint32 m_nMsgNr;
 
 private slots:
-    virtual void establishNewConnection(ProtoNetPeer* newClient);
-    virtual void executeCommand(google::protobuf::Message *cmd);
+    virtual void establishNewConnection(XiQNetPeer* newClient);
+    virtual void executeCommand(std::shared_ptr<google::protobuf::Message> cmd);
     virtual void establishNewNotifier(cNotificationValue *notifier);
     virtual void asyncHandler(quint32 irqreg);
 };

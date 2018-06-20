@@ -4,9 +4,9 @@
 #include <QList>
 #include <QString>
 #include <QTcpSocket>
-#include <protonetpeer.h>
+#include <xiqnetpeer.h>
 #include <xmlconfigreader.h>
-#include <protonetserver.h>
+#include <xiqnetserver.h>
 #include <scpi.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -75,9 +75,9 @@ cSCPI *cPCBServer::getSCPIInterface()
 void cPCBServer::setupServer()
 {
     m_pSCPInterface = new cSCPI(m_sServerName); // our scpi interface
-    myServer = new ProtoNetServer(this); // our working (talking) horse
+    myServer = new XiQNetServer(this); // our working (talking) horse
     myServer->setDefaultWrapper(&m_ProtobufWrapper);
-    connect(myServer,SIGNAL(sigClientConnected(ProtoNetPeer*)),this,SLOT(establishNewConnection(ProtoNetPeer*)));
+    connect(myServer,SIGNAL(sigClientConnected(XiQNetPeer*)),this,SLOT(establishNewConnection(XiQNetPeer*)));
 }
 
 
@@ -150,7 +150,7 @@ void cPCBServer::sendAnswer(cProtonetCommand *protoCmd)
         protobufAnswer.set_clientid(protoCmd->m_clientId, protoCmd->m_clientId.count());
         protobufAnswer.set_messagenr(protoCmd->m_nmessageNr);
 
-        protoCmd->m_pPeer->sendMessage(&protobufAnswer);
+        protoCmd->m_pPeer->sendMessage(protobufAnswer);
     }
 
     else
@@ -253,25 +253,25 @@ void cPCBServer::doUnregisterNotifier(cProtonetCommand *protoCmd)
     }
 }
 
-void cPCBServer::establishNewConnection(ProtoNetPeer *newClient)
+void cPCBServer::establishNewConnection(XiQNetPeer *newClient)
 {
-    connect(newClient,SIGNAL(sigMessageReceived(google::protobuf::Message*)),this,SLOT(executeCommand(google::protobuf::Message*)));
+    connect(newClient, &XiQNetPeer::sigMessageReceived,this, QOverload<std::shared_ptr<google::protobuf::Message> >::of(&cPCBServer::executeCommand));
     // later ... connect(newClient,SIGNAL(sigMessageReceived(QByteArray*)),this,SLOT(executeCommand(QByteArray*)));
 }
 
 
-void cPCBServer::executeCommand(google::protobuf::Message* cmd)
+void cPCBServer::executeCommand(std::shared_ptr<google::protobuf::Message> cmd)
 {
-    ProtobufMessage::NetMessage *protobufCommand;
+    std::shared_ptr<ProtobufMessage::NetMessage> protobufCommand = nullptr;
     cSCPIObject* scpiObject;
     QString dummy;
 
-    //ProtoNetPeer* client = qobject_cast<ProtoNetPeer*>(sender());
+    //XiQNetPeer* client = qobject_cast<XiQNetPeer*>(sender());
 
-    ProtoNetPeer* peer = qobject_cast<ProtoNetPeer*>(sender());
-    protobufCommand = static_cast<ProtobufMessage::NetMessage*>(cmd);
+    XiQNetPeer* peer = qobject_cast<XiQNetPeer*>(sender());
+    protobufCommand = std::static_pointer_cast<ProtobufMessage::NetMessage>(cmd);
 
-    if ( (protobufCommand != 0) && (peer != 0))
+    if ( (protobufCommand != nullptr) && (peer != nullptr))
     {
         if (protobufCommand->has_clientid())
         {
@@ -395,7 +395,7 @@ void cPCBServer::asyncHandler(quint32 irqreg)
                         protobufIntMessage.set_clientid(id, id.count());
                         protobufIntMessage.set_messagenr(0); // interrupt
 
-                        notData.netPeer->sendMessage(&protobufIntMessage);
+                        notData.netPeer->sendMessage(protobufIntMessage);
                     }
                 }
             }

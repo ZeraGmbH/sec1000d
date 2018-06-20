@@ -1,6 +1,6 @@
 #include <syslog.h>
 #include <QString>
-#include <protonetpeer.h>
+#include <xiqnetpeer.h>
 #include <netmessages.pb.h>
 #include <QtDebug>
 
@@ -20,12 +20,12 @@ void cRMConnection::connect2RM()
 {
     if (m_pResourceManagerClient) // in case we try to
         delete m_pResourceManagerClient;
-    m_pResourceManagerClient = new ProtoNetPeer(this);
+    m_pResourceManagerClient = new XiQNetPeer(this);
     m_pResourceManagerClient->setWrapper(&m_ProtobufWrapper);
     connect(m_pResourceManagerClient, SIGNAL(sigSocketError(QAbstractSocket::SocketError)), this, SLOT(tcpErrorHandler(QAbstractSocket::SocketError)));
     connect(m_pResourceManagerClient, SIGNAL(sigConnectionEstablished()), this, SIGNAL(connected()));
     connect(m_pResourceManagerClient, SIGNAL(sigConnectionClosed()), this, SIGNAL(connectionRMError()));
-    connect(m_pResourceManagerClient, SIGNAL(sigMessageReceived(google::protobuf::Message*)), this, SLOT(responseHandler(google::protobuf::Message*)));
+    connect(m_pResourceManagerClient, &XiQNetPeer::sigMessageReceived, this, &cRMConnection::responseHandler);
     m_pResourceManagerClient->startConnection(m_sIPAdr, m_nPort);
 }
 
@@ -39,7 +39,7 @@ void cRMConnection::SendCommand(QString &cmd, QString &par, quint32 msgnr)
     scpiCmd->set_parameter(par.toStdString());
     message.set_messagenr(msgnr);
 
-    m_pResourceManagerClient->sendMessage(&message);
+    m_pResourceManagerClient->sendMessage(message);
 }
 
 
@@ -50,11 +50,11 @@ void cRMConnection::tcpErrorHandler(QAbstractSocket::SocketError errorCode)
 }
 
 
-void cRMConnection::responseHandler(google::protobuf::Message *response)
+void cRMConnection::responseHandler(std::shared_ptr<google::protobuf::Message> response)
 {
-    ProtobufMessage::NetMessage *answer;
-    answer = static_cast<ProtobufMessage::NetMessage*>(response);
-    if (answer != 0)
+    std::shared_ptr<ProtobufMessage::NetMessage> answer = nullptr;
+    answer = std::static_pointer_cast<ProtobufMessage::NetMessage>(response);
+    if (answer != nullptr)
     {
         if ( !(answer->has_reply() && answer->reply().rtype() == answer->reply().ACK))
         {
@@ -86,5 +86,5 @@ void cRMConnection::SendIdent(QString ident)
     message->set_rtype(ProtobufMessage::NetMessage::NetReply::IDENT);
     message->set_body(ident.toStdString());
 
-    m_pResourceManagerClient->sendMessage(&envelope);
+    m_pResourceManagerClient->sendMessage(envelope);
 }

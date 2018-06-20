@@ -1,14 +1,14 @@
 #ifndef SEC1000DPROTOBUFWRAPPER_H
 #define SEC1000DPROTOBUFWRAPPER_H
 
-#include <protonetwrapper.h>
+#include <xiqnetwrapper.h>
 
-class cSec1000dProtobufWrapper : public ProtoNetWrapper
+class cSec1000dProtobufWrapper : public XiQNetWrapper
 {
 public:
   cSec1000dProtobufWrapper();
-  google::protobuf::Message *byteArrayToProtobuf(QByteArray bA);
-  QByteArray protobufToByteArray(google::protobuf::Message *pMessage);
+  std::shared_ptr<google::protobuf::Message> byteArrayToProtobuf(QByteArray bA) override;
+  QByteArray protobufToByteArray(const google::protobuf::Message &pMessage) override;
 };
 
 #endif // SEC1000DPROTOBUFWRAPPER_H

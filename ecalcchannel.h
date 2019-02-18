@@ -13,6 +13,28 @@
 
 #define baseChnName "ec"
 
+// some bit definitions
+#define en_n 5
+#define en_p 6
+#define direction 12
+#define single 13
+#define sssto 14
+#define ssarm 16
+#define imp_en 18
+#define impout_en 19
+#define cnt2carry 20
+
+// some cmdid definitions
+const quint32 conf[]=
+{
+    // mrate counter for error measurement or energy comparison in single mode
+    1<<en_n + 1<<single + 1<<cnt2carry,
+    // mrate counter for error measurement or energy comparison in continous mode
+    1<<en_n + 1<<cnt2carry,
+    // vi counter for error measurement or energy comparison
+    1<<en_n + 1<<direction + 1<<single + 3<<sssto + 2<<ssarm
+};
+
 namespace ECALCREG {
     enum { CMD, CONF, STATUS, INTMASK, INTREG, MTCNTin, MTCNTfin, MTCNTact, MTPULSin = 12, MTPAUSEin, MTPULS, MTPAUSE};
 }

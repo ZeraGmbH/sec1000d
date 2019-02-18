@@ -308,12 +308,12 @@ void cECalculatorChannel::m_setCmdId(cProtonetCommand *protoCmd)
             par = cmd.getParam(0);
             protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::errval]; // preset
             cmdId = par.toULong(&ok);
-            if (ok && (cmdId < 64) )
+            if (ok && (cmdId < 3) )
             {
                 quint32 reg;
-                lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (ECALCREG::CMD << 2), 0);
+                lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (ECALCREG::CONF << 2), 0);
                 read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
-                reg = (reg & 0xFFFFFF00) | cmdId;
+                reg = (reg & 0x00007C00) | conf[cmdId];
                 write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
                 protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::ack];
             }
@@ -335,8 +335,9 @@ void cECalculatorChannel::m_start(cProtonetCommand *protoCmd)
         {
             quint32 reg;
             lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (ECALCREG::CMD << 2), 0);
-            read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
-            reg = (reg & 0xFFFFFF3F) | 0x80;
+            //read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
+            //reg = (reg & 0xFFFFFF3F) | 0x80;
+            reg = 0x80;
             write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
             protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::ack];
         }
@@ -401,8 +402,9 @@ void cECalculatorChannel::m_StopErrorCalculator()
     quint32 reg;
 
     lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (ECALCREG::CMD << 2), 0);
-    read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
-    reg = (reg & 0xFFFFFF3F) | 0x40;
+    //read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
+    //reg = (reg & 0xFFFFFF3F) | 0x40;
+    reg = 0x40;
     write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
 }
 

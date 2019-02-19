@@ -14,15 +14,15 @@
 #define baseChnName "ec"
 
 // some bit definitions
-#define en_n 5
-#define en_p 6
-#define direction 12
-#define single 13
-#define sssto 14
-#define ssarm 16
-#define imp_en 18
-#define impout_en 19
-#define cnt2carry 20
+#define en_n 8
+#define en_p 9
+#define direction 15
+#define single 16
+#define sssto 17
+#define ssarm 19
+#define imp_en 21
+#define impout_en 22
+#define cnt2carry 23
 
 // some cmdid definitions
 const quint32 conf[]=

@@ -18,22 +18,12 @@
 #define en_p 9
 #define direction 15
 #define single 16
-#define sssto 17
-#define ssarm 19
+#define sssto 17 // sync steuerung stop ?
+#define ssarm 19 // sync steuerung (sorry hardware is german) arm
 #define imp_en 21
 #define impout_en 22
 #define cnt2carry 23
 
-// some cmdid definitions
-const quint32 conf[]=
-{
-    // mrate counter for error measurement or energy comparison in single mode
-    1<<en_n + 1<<single + 1<<cnt2carry,
-    // mrate counter for error measurement or energy comparison in continous mode
-    1<<en_n + 1<<cnt2carry,
-    // vi counter for error measurement or energy comparison
-    1<<en_n + 1<<direction + 1<<single + 3<<sssto + 2<<ssarm
-};
 
 namespace ECALCREG {
     enum { CMD, CONF, STATUS, INTMASK, INTREG, MTCNTin, MTCNTfin, MTCNTact, MTPULSin = 12, MTPAUSEin, MTPULS, MTPAUSE};
@@ -95,6 +85,8 @@ private:
     quint32 m_nBaseAdress;
     quint32 m_nMyAdress;
 
+    QList<quint32> CMDIDList;
+
     QString m_sName; // the channels name ec0...
     bool m_bSet; // we mark if the channel is occupied
     QByteArray m_ClientId; // we remark the clientid for arbitration purpose
@@ -107,6 +99,7 @@ private:
     void m_resetInt(cProtonetCommand* protoCmd);
 
     cNotificationValue notifierECalcChannelIntReg;
+
 };
 
 #endif // ECALCCHANNEL_H

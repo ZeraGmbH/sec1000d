@@ -23,6 +23,13 @@ cECalculatorChannel::cECalculatorChannel(cSEC1000dServer* server, cECalculatorSe
     m_nMyAdress = m_nBaseAdress + (nr << 6);
     m_sName = QString("%1%2").arg(baseChnName).arg(nr);
     m_bSet = false;
+
+    // mrate counter for error measurement or energy comparison in single mode
+    CMDIDList.append(1<<en_n + 1<<single + 1<<cnt2carry);
+    // mrate counter for error measurement or energy comparison in continous mode
+    CMDIDList.append(1<<en_n + 1<<cnt2carry);
+    // vi counter for error measurement or energy comparison
+    CMDIDList.append(1<<en_n + 1<<direction + 1<<single + 3<<sssto + 2<<ssarm);
 }
 
 
@@ -313,7 +320,7 @@ void cECalculatorChannel::m_setCmdId(cProtonetCommand *protoCmd)
                 quint32 reg;
                 lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (ECALCREG::CONF << 2), 0);
                 read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
-                reg = (reg & 0x00007C00) | conf[cmdId];
+                reg = (reg & 0x00007C00) | CMDIDList.at(cmdId);
                 write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
                 protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::ack];
             }

@@ -25,11 +25,11 @@ cECalculatorChannel::cECalculatorChannel(cSEC1000dServer* server, cECalculatorSe
     m_bSet = false;
 
     // mrate counter for error measurement or energy comparison in single mode
-    CMDIDList.append(1<<en_n + 1<<single + 1<<cnt2carry);
+    CMDIDList.append((1<<en_n) + (1<<single) + (1<<cnt2carry));
     // mrate counter for error measurement or energy comparison in continous mode
-    CMDIDList.append(1<<en_n + 1<<cnt2carry);
+    CMDIDList.append((1<<en_n) + (1<<cnt2carry));
     // vi counter for error measurement or energy comparison
-    CMDIDList.append(1<<en_n + 1<<direction + 1<<single + 3<<sssto + 2<<ssarm);
+    CMDIDList.append((1<<en_n) + (1<<direction) + (1<<single) + (3<<sssto) + (2<<ssarm));
 }
 
 

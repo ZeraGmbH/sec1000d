@@ -320,7 +320,7 @@ void cECalculatorChannel::m_setCmdId(cProtonetCommand *protoCmd)
                 quint32 reg;
                 lseek(m_pMyServer->DevFileDescriptor, m_nMyAdress + (ECALCREG::CONF << 2), 0);
                 read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
-                reg = (reg & 0x00007C00) | CMDIDList.at(cmdId);
+                reg = (reg & 0x00007CFF) | CMDIDList.at(cmdId);
                 write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
                 protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::ack];
             }

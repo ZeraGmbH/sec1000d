@@ -29,7 +29,7 @@ cECalculatorChannel::cECalculatorChannel(cSEC1000dServer* server, cECalculatorSe
     // mrate counter for error measurement or energy comparison in continous mode
     CMDIDList.append((1<<en_n) + (1<<cnt2carry));
     // vi counter for error measurement or energy comparison
-    CMDIDList.append((1<<en_n) + (1<<direction) + (1<<single) + (3<<sssto) + (1<<ssarm));
+    CMDIDList.append((1<<en_n) + (1<<direction) + (1<<single) + (3<<sssto) + (2<<ssarm));
 }
 
 
@@ -412,6 +412,9 @@ void cECalculatorChannel::m_StopErrorCalculator()
     //read(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
     //reg = (reg & 0xFFFFFF3F) | 0x40;
     reg = 0x40;
+    write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
+    // we must reset the stop bit in command register because ecalculator will never start
+    reg = 0x0;
     write(m_pMyServer->DevFileDescriptor,(char*) &reg, 4);
 }
 

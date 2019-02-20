@@ -29,7 +29,7 @@ cECalculatorChannel::cECalculatorChannel(cSEC1000dServer* server, cECalculatorSe
     // mrate counter for error measurement or energy comparison in continous mode
     CMDIDList.append((1<<en_n) + (1<<cnt2carry));
     // vi counter for error measurement or energy comparison
-    CMDIDList.append((1<<en_n) + (1<<direction) + (1<<single) + (3<<sssto) + (2<<ssarm));
+    CMDIDList.append((1<<en_n) + (1<<direction) + (1<<single) + (3<<sssto) + (1<<ssarm));
 }
 
 

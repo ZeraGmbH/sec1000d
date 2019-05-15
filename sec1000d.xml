@@ -19,7 +19,7 @@
             </device>
         </fpga>
         <inputs>
-            <n>7</n>
+            <n>8</n>
             <inp1>
                 <name>sh0</name>
                 <muxer>5</muxer>
@@ -48,6 +48,10 @@
                 <name>hk0</name>
                 <muxer>6</muxer>
             </inp7>
+            <inp8>
+                <name>t1ms</name>
+                <muxer>7</muxer>
+            </inp8>
         </inputs>
     </connectivity>
 

@@ -64,6 +64,7 @@
             <xs:enumeration value="fi2"/>
             <xs:enumeration value="fi3"/>
             <xs:enumeration value="hk0"/>
+            <xs:enumeration value="t1ms"/>
         </xs:restriction>
     </xs:simpleType>
 

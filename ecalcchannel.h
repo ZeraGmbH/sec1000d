@@ -17,7 +17,7 @@
 #define en_n 8
 #define en_p 9
 #define direction 15
-#define single 16
+#define bitSingle 16
 #define sssto 17 // sync steuerung stop ?
 #define ssarm 19 // sync steuerung (sorry hardware is german) arm
 #define imp_en 21

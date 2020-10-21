@@ -40,7 +40,7 @@ cECalculatorInterface::~cECalculatorInterface()
     cECalculatorChannel* cptr;
 
     int n = m_ECalculatorChannelList.count();
-    for (int i = 0; n; i++)
+    for (int i = 0; i < n; i++)
     {
         cptr = m_ECalculatorChannelList.at(i);
         delete cptr;

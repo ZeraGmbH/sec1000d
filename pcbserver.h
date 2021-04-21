@@ -133,7 +133,7 @@ private:
     QList<cNotificationData> notifierRegisterNext;
     QList<cNotificationData> notifierRegisterList;
 
-    void doUnregisterNotifier(cProtonetCommand *protoCmd);
+    void doUnregisterNotifier(XiQNetPeer *peer, const QByteArray &clientID = QByteArray());
     quint32 m_nMsgNr;
 
 private slots:
@@ -141,6 +141,7 @@ private slots:
     virtual void executeCommand(std::shared_ptr<google::protobuf::Message> cmd);
     virtual void establishNewNotifier(cNotificationValue *notifier);
     virtual void asyncHandler(quint32 irqreg);
+    virtual void peerConnectionClosed();
 };
 
 #endif // PCBSERVER_H

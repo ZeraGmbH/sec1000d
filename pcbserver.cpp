@@ -189,6 +189,7 @@ void cPCBServer::m_RegisterNotifier(cProtonetCommand *protoCmd)
 
             notData.netPeer = protoCmd->m_pPeer;
             notData.clientID = protoCmd->m_clientId;
+            connect(notData.netPeer, &XiQNetPeer::sigConnectionClosed, this, &cPCBServer::peerConnectionClosed);
 
             notifierRegisterNext.append(notData); // we wait for a notifier signal
 
@@ -219,7 +220,7 @@ void cPCBServer::m_UnregisterNotifier(cProtonetCommand *protoCmd)
 
     if (cmd.isCommand(1) && (cmd.getParam(0) == "") )
     {
-        doUnregisterNotifier(protoCmd);
+        doUnregisterNotifier(protoCmd->m_pPeer, protoCmd->m_clientId);
         protoCmd->m_sOutput = SCPI::scpiAnswer[SCPI::ack];
     }
     else
@@ -227,28 +228,19 @@ void cPCBServer::m_UnregisterNotifier(cProtonetCommand *protoCmd)
 }
 
 
-void cPCBServer::doUnregisterNotifier(cProtonetCommand *protoCmd)
+void cPCBServer::doUnregisterNotifier(XiQNetPeer* peer, const QByteArray &clientID)
 {
-    if (notifierRegisterList.count() > 0)
-    {
-        QList<int> posList;
+    if (notifierRegisterList.count() > 0) {
         // we have to remove all notifiers for this client and or clientId
-        for (int i = 0; i < notifierRegisterList.count(); i++)
-        {
+        // iterate backwards so removals do not confuse our loop
+        for (int i = notifierRegisterList.count()-1; i >= 0; i--) {
             cNotificationData notData = notifierRegisterList.at(i);
-            if (protoCmd->m_pPeer == notData.netPeer)
-            { // we found the client
-                if (notData.clientID.isEmpty() or (notData.clientID == protoCmd->m_clientId))
-                {
-                    posList.append(i);
+            if (peer == notData.netPeer) {
+                // we found the client
+                if (clientID.isEmpty() || notData.clientID.isEmpty() || (notData.clientID == clientID)) {
+                    notifierRegisterList.removeAt(i);
                 }
             }
-        }
-
-        if (posList.count() > 0)
-        {
-            for (int i = 0; i < posList.count(); i++)
-                notifierRegisterList.removeAt(posList.at(i));
         }
     }
 }
@@ -280,8 +272,7 @@ void cPCBServer::executeCommand(std::shared_ptr<google::protobuf::Message> cmd)
             if (protobufCommand->has_netcommand())
             {
                 // in case of "lost" clients we delete registration for notification
-                cProtonetCommand* protoCmd = new cProtonetCommand(peer, true, true, clientId, 0, "", 0);
-                doUnregisterNotifier(protoCmd);
+                doUnregisterNotifier(peer, clientId);
             }
 
             else
@@ -400,6 +391,13 @@ void cPCBServer::asyncHandler(quint32 irqreg)
                 }
             }
     }
+}
+
+
+void cPCBServer::peerConnectionClosed()
+{
+    XiQNetPeer *peer = qobject_cast<XiQNetPeer*>(QObject::sender());
+    doUnregisterNotifier(peer);
 }
 
 

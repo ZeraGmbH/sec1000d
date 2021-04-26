@@ -19,7 +19,7 @@
             </device>
         </fpga>
         <inputs>
-            <n>8</n>
+            <n>11</n>
             <inp1>
                 <name>sh0</name>
                 <muxer>5</muxer>
@@ -29,29 +29,41 @@
                 <muxer>0</muxer>
             </inp2>
             <inp3>
-                <name>fo0</name>
-                <muxer>27</muxer>
+                <name>fi1</name>
+                <muxer>1</muxer>
             </inp3>
             <inp4>
-                <name>fo1</name>
-                <muxer>28</muxer>
+                <name>fi2</name>
+                <muxer>2</muxer>
             </inp4>
             <inp5>
-                <name>fo2</name>
-                <muxer>29</muxer>
+                <name>fi3</name>
+                <muxer>3</muxer>
             </inp5>
             <inp6>
-                <name>fo3</name>
-                <muxer>30</muxer>
+                <name>fo0</name>
+                <muxer>27</muxer>
             </inp6>
             <inp7>
-                <name>hk0</name>
-                <muxer>6</muxer>
+                <name>fo1</name>
+                <muxer>28</muxer>
             </inp7>
             <inp8>
+                <name>fo2</name>
+                <muxer>29</muxer>
+            </inp8>
+            <inp9>
+                <name>fo3</name>
+                <muxer>30</muxer>
+            </inp9>
+            <inp10>
+                <name>hk0</name>
+                <muxer>6</muxer>
+            </inp10>
+            <inp11>
                 <name>t1ms</name>
                 <muxer>7</muxer>
-            </inp8>
+            </inp11>
         </inputs>
     </connectivity>
 

@@ -28,7 +28,6 @@ signals:
 
 protected:
     QList<quint32> msgNrList;
-    cCOM5003dServer* m_pMyServer;
     void register1Resource(cRMConnection *rmConnection, quint32 msgnr, QString registerParameter);
     void unregister1Resource(cRMConnection *rmConnection, quint32 msgnr, QString unregisterParameter);
 

@@ -20,10 +20,3 @@ std::shared_ptr<google::protobuf::Message> cSec1000dProtobufWrapper::byteArrayTo
     return proto;
 }
 
-
-QByteArray cSec1000dProtobufWrapper::protobufToByteArray(const google::protobuf::Message &pMessage)
-{
-    return QByteArray(pMessage.SerializeAsString().c_str(), pMessage.ByteSize());
-}
-
-

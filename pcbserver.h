@@ -9,8 +9,8 @@
 
 #include <QObject>
 #include <QList>
+#include <xiqnetwrapper.h>
 
-#include "sec1000dprotobufwrapper.h"
 #include "scpiconnection.h"
 #include "notificationvalue.h"
 #include "notificationdata.h"
@@ -102,7 +102,7 @@ signals:
 protected:
     void initSCPIConnections();
     XiQNetServer* myServer; // the real server that does the communication job
-    cSec1000dProtobufWrapper m_ProtobufWrapper;
+    XiQNetWrapper m_ProtobufWrapper;
     Zera::XMLConfig::cReader* myXMLConfigReader; // the xml configurator
     QString m_sConfigurationPath;
     QList<cSCPIConnection*> scpiConnectionList; // a list of all scpi connections

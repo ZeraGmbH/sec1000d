@@ -61,7 +61,6 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/systeminfo.cpp
     ${PROJECT_SOURCE_DIR}/resource.cpp
     ${PROJECT_SOURCE_DIR}/rmconnection.cpp
-    ${PROJECT_SOURCE_DIR}/sec1000dprotobufwrapper.cpp
     ${PROJECT_SOURCE_DIR}/protonetcommand.cpp
     ${PROJECT_SOURCE_DIR}/ecalcsettings.cpp
     ${PROJECT_SOURCE_DIR}/ecalcinterface.cpp
@@ -88,7 +87,6 @@ set(HEADER
     ${PROJECT_SOURCE_DIR}/resource.h
     ${PROJECT_SOURCE_DIR}/systeminfo.h
     ${PROJECT_SOURCE_DIR}/rmconnection.h
-    ${PROJECT_SOURCE_DIR}/sec1000dprotobufwrapper.h
     ${PROJECT_SOURCE_DIR}/notificationdata.h
     ${PROJECT_SOURCE_DIR}/protonetcommand.h
     ${PROJECT_SOURCE_DIR}/ecalcsettings.h

@@ -6,9 +6,8 @@
 class cSec1000dProtobufWrapper : public XiQNetWrapper
 {
 public:
-  cSec1000dProtobufWrapper();
-  std::shared_ptr<google::protobuf::Message> byteArrayToProtobuf(QByteArray bA) override;
-  QByteArray protobufToByteArray(const google::protobuf::Message &pMessage) override;
+    cSec1000dProtobufWrapper();
+    std::shared_ptr<google::protobuf::Message> byteArrayToProtobuf(QByteArray bA) override;
 };
 
 #endif // SEC1000DPROTOBUFWRAPPER_H

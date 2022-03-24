@@ -1,7 +1,7 @@
 // globale definition
 
-#ifndef COM5003DGOBAL_H
-#define COM5003DGLOBAL_H
+#ifndef SEC1000DGLOBAL_H
+#define SEC1000DGLOBAL_H
 
 enum DebugLevel {NoDebug, DebugLevel1, DebugLevel2, DebugLevel3 = 4, MaxDebugLevel = 7};
 

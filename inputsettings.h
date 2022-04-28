@@ -1,12 +1,8 @@
 #ifndef INPUTSETTINGS
 #define INPUTSETTINGS
 
-
-#include <QObject>
-#include <QList>
+#include <xmlsettings.h>
 #include <QHash>
-
-#include "xmlsettings.h"
 
 namespace InputSettings
 {
@@ -18,23 +14,13 @@ enum configstate
 };
 }
 
-namespace Zera
-{
-namespace XMLConfig
-{
-    class XMLConfigReader;
-}
-}
-
-
 struct cInputInfo
 {
     QString m_sName;
     quint8 m_nMux;
 };
 
-
-class cInputSettings : public cXMLSettings
+class cInputSettings : public XMLSettings
 {
     Q_OBJECT
 

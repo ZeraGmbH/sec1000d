@@ -1,20 +1,9 @@
-#include <QList>
-#include <QStringList>
-#include <QDebug>
-#include <scpi.h>
-
-#include "xmlsettings.h"
-#include "scpiconnection.h"
-#include "resource.h"
-
-#include "sec1000d.h"
-#include "ecalcsettings.h"
-#include "fpgasettings.h"
-#include "ethsettings.h"
 #include "ecalcinterface.h"
-#include "ecalcchannel.h"
+#include "scpiconnection.h"
+#include "sec1000d.h"
 #include "protonetcommand.h"
-
+#include <scpi.h>
+#include <xmlsettings.h>
 
 cECalculatorInterface::cECalculatorInterface(cSEC1000dServer* server, cETHSettings* ethsettings, cECalculatorSettings* ecalcSettings, cFPGASettings* fpgasettings, cInputSettings *inputsettings)
     : m_pMyServer(server), m_pETHsettings(ethsettings), m_pecalcsettings(ecalcSettings), m_pfpgasettings(fpgasettings), m_pInputSettings(inputsettings)

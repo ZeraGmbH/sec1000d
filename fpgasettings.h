@@ -1,10 +1,7 @@
 #ifndef FPGASETTINGS_H
 #define FPGASETTINGS_H
 
-#include <QObject>
-#include <QString>
-
-#include "xmlsettings.h"
+#include <xmlsettings.h>
 
 namespace FPGASettings
 {
@@ -14,16 +11,7 @@ enum configstate
 };
 }
 
-namespace Zera
-{
-namespace XMLConfig
-{
-    class XMLConfigReader;
-}
-}
-
-
-class cFPGASettings : public cXMLSettings
+class cFPGASettings : public XMLSettings
 {
     Q_OBJECT
 

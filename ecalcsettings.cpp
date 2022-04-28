@@ -1,10 +1,6 @@
-#include <QList>
-#include <QVariant>
-#include <xmlconfigreader.h>
-#include <QDebug>
-#include "xmlsettings.h"
 #include "ecalcsettings.h"
-
+#include <xmlsettings.h>
+#include <xmlconfigreader.h>
 
 cECalculatorSettings::cECalculatorSettings(Zera::XMLConfig::cReader *xmlread)
 {

@@ -1,17 +1,13 @@
 #ifndef ETHSETTINGS_H
 #define ETHSETTINGS_H
 
-#include <QObject>
-
-#include "xmlsettings.h"
-
+#include <xmlsettings.h>
 
 enum ethmember
 {
     server,
     resourcemanager
 };
-
 
 enum ethconfigstate
 {
@@ -20,16 +16,7 @@ enum ethconfigstate
     setRMPort
 };
 
-
-namespace Zera
-{
-namespace XMLConfig
-{
-    class cReader;
-}
-}
-
-class cETHSettings : public cXMLSettings
+class cETHSettings : public XMLSettings
 {
     Q_OBJECT
 
@@ -45,7 +32,5 @@ private:
     QString m_sRMIPAdr;
     quint16 m_nServerPort, m_nRMPort;
 };
-
-
 
 #endif // ETHSETTINGS_H

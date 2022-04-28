@@ -82,7 +82,6 @@ set(HEADER
     ${PROJECT_SOURCE_DIR}/statusinterface.h
     ${PROJECT_SOURCE_DIR}/scpiconnection.h
     ${PROJECT_SOURCE_DIR}/systeminterface.h
-    ${PROJECT_SOURCE_DIR}/xmlsettings.h
     ${PROJECT_SOURCE_DIR}/debugsettings.h
     ${PROJECT_SOURCE_DIR}/resource.h
     ${PROJECT_SOURCE_DIR}/systeminfo.h

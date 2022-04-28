@@ -1,10 +1,7 @@
 #ifndef ECALCSETTINGS_H
 #define ECALCSETTINGS_H
 
-#include <QObject>
-#include <QList>
-
-#include "xmlsettings.h"
+#include <xmlsettings.h>
 
 namespace ECalculatorSystem
 {
@@ -17,16 +14,7 @@ enum configstate
 };
 }
 
-class QString;
-namespace Zera
-{
-namespace XMLConfig
-{
-    class cReader;
-}
-}
-
-class cECalculatorSettings : public cXMLSettings
+class cECalculatorSettings : public XMLSettings
 {
     Q_OBJECT
 public:

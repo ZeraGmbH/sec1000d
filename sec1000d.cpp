@@ -153,13 +153,7 @@ void cSEC1000dServer::doConfiguration()
                 QString s = args.at(1);
                 qDebug() << s;
 
-                if (myXMLConfigReader->loadXML(s)) // the first parameter should be the filename
-                {
-                    // xmlfile ok -> nothing to do .. the configreader will emit all configuration
-                    // signals and after this the finishedparsingXML signal
-                }
-                else
-                {
+                if(!myXMLConfigReader->loadXMLFile(s)) {
                     m_nerror = xmlfileError;
                     emit abortInit();
                 }

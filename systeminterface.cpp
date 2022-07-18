@@ -2,7 +2,7 @@
 #include <scpicommand.h>
 
 #include "sec1000d.h"
-#include "scpidelegate.h"
+#include <scpidelegate.h>
 #include "systeminfo.h"
 #include "systeminterface.h"
 #include "protonetcommand.h"

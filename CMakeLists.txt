@@ -30,6 +30,7 @@ include(GNUInstallDirs)
 #Find dependecies
 find_package(Qt5 COMPONENTS Gui Xml Network CONFIG REQUIRED)
 find_package(SCPI REQUIRED)
+find_package(scpi-tcp REQUIRED)
 find_package(xiqnet REQUIRED)
 find_package(zeramisc REQUIRED)
 find_package(zeraxmlconfig REQUIRED)
@@ -61,7 +62,6 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/systeminfo.cpp
     ${PROJECT_SOURCE_DIR}/resource.cpp
     ${PROJECT_SOURCE_DIR}/rmconnection.cpp
-    ${PROJECT_SOURCE_DIR}/protonetcommand.cpp
     ${PROJECT_SOURCE_DIR}/ecalcsettings.cpp
     ${PROJECT_SOURCE_DIR}/ecalcinterface.cpp
     ${PROJECT_SOURCE_DIR}/ecalcchannel.cpp
@@ -87,7 +87,6 @@ set(HEADER
     ${PROJECT_SOURCE_DIR}/systeminfo.h
     ${PROJECT_SOURCE_DIR}/rmconnection.h
     ${PROJECT_SOURCE_DIR}/notificationdata.h
-    ${PROJECT_SOURCE_DIR}/protonetcommand.h
     ${PROJECT_SOURCE_DIR}/ecalcsettings.h
     ${PROJECT_SOURCE_DIR}/ecalcinterface.h
     ${PROJECT_SOURCE_DIR}/ecalcchannel.h
@@ -125,8 +124,9 @@ target_link_libraries(sec1000d
     Qt5::Xml
     Qt5::Network
     Qt5::Gui
-    Zera::SCPI 
-    VeinMeta::xiqnet 
+    Zera::SCPI
+    VeinMeta::xiqnet
+    Zera::scpi-tcp
     ZeraClasses::zeramisc 
     ZeraClasses::zeraxmlconfig 
     ZeraClasses::zeramath 

@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QList>
-#include "scpidelegate.h"
+#include <scpidelegate.h>
 
 class cSCPI;
 class cNotificationValue;

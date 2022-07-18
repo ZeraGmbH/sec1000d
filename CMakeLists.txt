@@ -54,7 +54,6 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/pcbserver.cpp
     ${PROJECT_SOURCE_DIR}/ethsettings.cpp
     ${PROJECT_SOURCE_DIR}/fpgasettings.cpp
-    ${PROJECT_SOURCE_DIR}/scpidelegate.cpp
     ${PROJECT_SOURCE_DIR}/statusinterface.cpp
     ${PROJECT_SOURCE_DIR}/scpiconnection.cpp
     ${PROJECT_SOURCE_DIR}/systeminterface.cpp
@@ -78,7 +77,6 @@ set(HEADER
     ${PROJECT_SOURCE_DIR}/sec1000dglobal.h
     ${PROJECT_SOURCE_DIR}/ethsettings.h
     ${PROJECT_SOURCE_DIR}/fpgasettings.h
-    ${PROJECT_SOURCE_DIR}/scpidelegate.h
     ${PROJECT_SOURCE_DIR}/statusinterface.h
     ${PROJECT_SOURCE_DIR}/scpiconnection.h
     ${PROJECT_SOURCE_DIR}/systeminterface.h

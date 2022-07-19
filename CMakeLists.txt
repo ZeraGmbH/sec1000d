@@ -55,7 +55,6 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/ethsettings.cpp
     ${PROJECT_SOURCE_DIR}/fpgasettings.cpp
     ${PROJECT_SOURCE_DIR}/statusinterface.cpp
-    ${PROJECT_SOURCE_DIR}/scpiconnection.cpp
     ${PROJECT_SOURCE_DIR}/systeminterface.cpp
     ${PROJECT_SOURCE_DIR}/debugsettings.cpp
     ${PROJECT_SOURCE_DIR}/systeminfo.cpp
@@ -64,7 +63,6 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/ecalcsettings.cpp
     ${PROJECT_SOURCE_DIR}/ecalcinterface.cpp
     ${PROJECT_SOURCE_DIR}/ecalcchannel.cpp
-    ${PROJECT_SOURCE_DIR}/notificationvalue.cpp
     ${PROJECT_SOURCE_DIR}/inputsettings.cpp
     )
 
@@ -78,7 +76,6 @@ set(HEADER
     ${PROJECT_SOURCE_DIR}/ethsettings.h
     ${PROJECT_SOURCE_DIR}/fpgasettings.h
     ${PROJECT_SOURCE_DIR}/statusinterface.h
-    ${PROJECT_SOURCE_DIR}/scpiconnection.h
     ${PROJECT_SOURCE_DIR}/systeminterface.h
     ${PROJECT_SOURCE_DIR}/debugsettings.h
     ${PROJECT_SOURCE_DIR}/resource.h
@@ -88,7 +85,6 @@ set(HEADER
     ${PROJECT_SOURCE_DIR}/ecalcsettings.h
     ${PROJECT_SOURCE_DIR}/ecalcinterface.h
     ${PROJECT_SOURCE_DIR}/ecalcchannel.h
-    ${PROJECT_SOURCE_DIR}/notificationvalue.h
     ${PROJECT_SOURCE_DIR}/inputsettings.h 
     )
 

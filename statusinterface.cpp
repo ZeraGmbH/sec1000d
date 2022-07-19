@@ -2,18 +2,19 @@
 #include "protonetcommand.h"
 
 
-cStatusInterface::cStatusInterface()
+cStatusInterface::cStatusInterface() :
+    cSCPIConnection(ScpiSingletonFactory::getScpiObj(ServerName))
 {
 }
 
-void cStatusInterface::initSCPIConnection(QString leadingNodes, cSCPI *scpiInterface)
+void cStatusInterface::initSCPIConnection(QString leadingNodes)
 {
     cSCPIDelegate* delegate;
 
     if (leadingNodes != "")
         leadingNodes += ":";
 
-    delegate = new cSCPIDelegate(QString("%1STATUS").arg(leadingNodes),"DEVICE",SCPI::isQuery,scpiInterface, StatusSystem::cmdDevice);
+    delegate = new cSCPIDelegate(QString("%1STATUS").arg(leadingNodes),"DEVICE",SCPI::isQuery, m_pSCPIInterface, StatusSystem::cmdDevice);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
 }

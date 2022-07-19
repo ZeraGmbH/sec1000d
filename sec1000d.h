@@ -29,7 +29,7 @@ class cSEC1000dServer: public cPCBServer
     Q_OBJECT
 
 public:
-    explicit cSEC1000dServer(QObject* parent=0);
+    explicit cSEC1000dServer();
     ~cSEC1000dServer();
 
     cDebugSettings* m_pDebugSettings;

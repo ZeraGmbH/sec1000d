@@ -10,9 +10,11 @@
 #include <QObject>
 #include <QList>
 #include <xiqnetwrapper.h>
+#include <scpisingletonfactory.h>
 
-#include "scpiconnection.h"
-#include "notificationvalue.h"
+#include "sec1000dglobal.h"
+#include <scpiconnection.h>
+#include <notificationvalue.h>
 #include "notificationdata.h"
 
 class QTcpSocket;
@@ -80,8 +82,8 @@ public:
       @b Initialise the const variables and connections for new clients and their commands
       @param the servers name
       */
-    explicit cPCBServer(QObject* parent=0);
-    virtual void initSCPIConnection(QString leadingNodes, cSCPI* scpiInterface);
+    explicit cPCBServer();
+    virtual void initSCPIConnection(QString leadingNodes) override;
     quint32 getMsgNr();
 
     /**
@@ -89,8 +91,6 @@ public:
       */
     QString& getName();
     QString& getVersion();
-    cSCPI* getSCPIInterface();
-
 
     cStatusInterface* m_pStatusInterface;
 
@@ -111,7 +111,7 @@ protected:
 protected slots:
     virtual void doConfiguration() = 0; // all servers must configure
     virtual void setupServer(); // all servers must setup
-    virtual void executeCommand(int cmdCode, cProtonetCommand* protoCmd);
+    virtual void executeCommand(int cmdCode, cProtonetCommand* protoCmd) override;
     virtual void sendAnswer(cProtonetCommand* protoCmd);
 
 private:
@@ -124,7 +124,6 @@ private:
     /**
       @b A pointer to the server's scpi interface.
       */
-    cSCPI *m_pSCPInterface;
     QString m_sInput, m_sOutput;
     QTcpSocket* resourceManagerSocket;
 

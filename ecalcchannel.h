@@ -6,9 +6,9 @@
 #include <QList>
 #include <QByteArray>
 
-#include "scpiconnection.h"
+#include <scpiconnection.h>
 #include "ecalcsettings.h"
-#include "notificationvalue.h"
+#include <notificationvalue.h>
 
 
 #define baseChnName "ec"
@@ -61,7 +61,7 @@ class cECalculatorChannel : public cSCPIConnection
 public:
     cECalculatorChannel(cSEC1000dServer* server, cECalculatorSettings* esettings, cFPGASettings* fsettings, cInputSettings* inpsettings, quint16 nr);
     ~cECalculatorChannel();
-    virtual void initSCPIConnection(QString leadingNodes, cSCPI *scpiInterface);
+    virtual void initSCPIConnection(QString leadingNodes);
 
     QString& getName();
     bool isfree();

@@ -4,7 +4,7 @@
 #include <QByteArray>
 #include <xiqnetpeer.h>
 
-#include "notificationvalue.h"
+#include <notificationvalue.h>
 
 struct cNotificationData
 {

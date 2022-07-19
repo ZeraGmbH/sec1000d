@@ -4,9 +4,9 @@
 #include "rmconnection.h"
 
 
-cResource::cResource(QObject *parent)
+cResource::cResource(cSCPI *scpiInterface) :
+    cSCPIConnection(scpiInterface)
 {
-    setParent(parent);
 }
 
 

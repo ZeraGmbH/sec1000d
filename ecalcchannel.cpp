@@ -8,7 +8,7 @@
 #include <scpicommand.h>
 
 #include "sec1000d.h"
-#include "scpiconnection.h"
+#include <scpiconnection.h>
 #include "ecalcchannel.h"
 #include "fpgasettings.h"
 #include "inputsettings.h"
@@ -16,8 +16,13 @@
 
 extern void SigHandler(int);
 
-cECalculatorChannel::cECalculatorChannel(cSEC1000dServer* server, cECalculatorSettings* esettings, cFPGASettings* fsettings, cInputSettings *inpsettings, quint16 nr)
-    :m_pMyServer(server), m_pecalcsettings(esettings), m_pfpgasettings(fsettings), m_pInputSettings(inpsettings), m_nNr(nr)
+cECalculatorChannel::cECalculatorChannel(cSEC1000dServer* server, cECalculatorSettings* esettings, cFPGASettings* fsettings, cInputSettings *inpsettings, quint16 nr) :
+    cSCPIConnection(ScpiSingletonFactory::getScpiObj(ServerName)),
+    m_pMyServer(server),
+    m_pecalcsettings(esettings),
+    m_pfpgasettings(fsettings),
+    m_pInputSettings(inpsettings),
+    m_nNr(nr)
 {
     m_nBaseAdress = m_pecalcsettings->getBaseAdress();
     m_nMyAdress = m_nBaseAdress + (nr << 6);
@@ -38,65 +43,65 @@ cECalculatorChannel::~cECalculatorChannel()
 }
 
 
-void cECalculatorChannel::initSCPIConnection(QString leadingNodes, cSCPI *scpiInterface)
+void cECalculatorChannel::initSCPIConnection(QString leadingNodes)
 {
     cSCPIDelegate* delegate;
 
     if (leadingNodes != "")
         leadingNodes += ":";
 
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::CMD), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::CMD), SCPI::isCmdwP | SCPI::isQuery, m_pSCPIInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::CONF), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::CONF), SCPI::isCmdwP | SCPI::isQuery, m_pSCPIInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::STATUS), SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::STATUS), SCPI::isQuery, m_pSCPIInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::INTMASK), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::INTMASK), SCPI::isCmdwP | SCPI::isQuery, m_pSCPIInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::INTREG), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::INTREG), SCPI::isCmdwP | SCPI::isQuery, m_pSCPIInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTCNTin), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTCNTin), SCPI::isCmdwP | SCPI::isQuery, m_pSCPIInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTCNTfin), SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTCNTfin), SCPI::isQuery, m_pSCPIInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTCNTact), SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTCNTact), SCPI::isQuery, m_pSCPIInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPULSin), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPULSin), SCPI::isCmdwP | SCPI::isQuery, m_pSCPIInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPAUSEin), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPAUSEin), SCPI::isCmdwP | SCPI::isQuery, m_pSCPIInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPULS), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPULS), SCPI::isCmdwP | SCPI::isQuery, m_pSCPIInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPAUSE), SCPI::isCmdwP | SCPI::isQuery, scpiInterface, ECalcChannel::cmdRegister);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName), QString("R%1").arg(ECALCREG::MTPAUSE), SCPI::isCmdwP | SCPI::isQuery, m_pSCPIInterface, ECalcChannel::cmdRegister);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"SYNC", SCPI::isCmdwP, scpiInterface, ECalcChannel::setSync);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"SYNC", SCPI::isCmdwP, m_pSCPIInterface, ECalcChannel::setSync);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"MUX", SCPI::isCmdwP, scpiInterface, ECalcChannel::setMux);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"MUX", SCPI::isCmdwP, m_pSCPIInterface, ECalcChannel::setMux);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"CMDID", SCPI::isCmdwP, scpiInterface, ECalcChannel::setCmdid);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"CMDID", SCPI::isCmdwP, m_pSCPIInterface, ECalcChannel::setCmdid);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"START", SCPI::isCmdwP, scpiInterface, ECalcChannel::start);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"START", SCPI::isCmdwP, m_pSCPIInterface, ECalcChannel::start);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"STOP", SCPI::isCmdwP, scpiInterface, ECalcChannel::stop);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"STOP", SCPI::isCmdwP, m_pSCPIInterface, ECalcChannel::stop);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"INTACK", SCPI::isCmdwP, scpiInterface, ECalcChannel::intAcknowledge);
+    delegate = new cSCPIDelegate(QString("%1%2").arg(leadingNodes).arg(m_sName),"INTACK", SCPI::isCmdwP, m_pSCPIInterface, ECalcChannel::intAcknowledge);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
 }
@@ -188,7 +193,7 @@ void cECalculatorChannel::m_ReadWriteRegister(cProtonetCommand *protoCmd)
         switch (regInd)
         {
             case ECALCREG::INTREG:
-                emit notifier(&notifierECalcChannelIntReg);
+                emit valNotifier(&notifierECalcChannelIntReg);
                 protoCmd->m_sOutput =  QString("%1").arg(notifierECalcChannelIntReg.getValue()); // we only return the notifiers value
                 break;
 

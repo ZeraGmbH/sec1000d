@@ -1,12 +1,17 @@
 #include "ecalcinterface.h"
-#include "scpiconnection.h"
+#include <scpiconnection.h>
 #include "sec1000d.h"
 #include "protonetcommand.h"
 #include <scpi.h>
 #include <xmlsettings.h>
 
-cECalculatorInterface::cECalculatorInterface(cSEC1000dServer* server, cETHSettings* ethsettings, cECalculatorSettings* ecalcSettings, cFPGASettings* fpgasettings, cInputSettings *inputsettings)
-    : m_pMyServer(server), m_pETHsettings(ethsettings), m_pecalcsettings(ecalcSettings), m_pfpgasettings(fpgasettings), m_pInputSettings(inputsettings)
+cECalculatorInterface::cECalculatorInterface(cSEC1000dServer* server, cETHSettings* ethsettings, cECalculatorSettings* ecalcSettings, cFPGASettings* fpgasettings, cInputSettings *inputsettings) :
+    cResource(ScpiSingletonFactory::getScpiObj(ServerName)),
+    m_pMyServer(server),
+    m_pETHsettings(ethsettings),
+    m_pecalcsettings(ecalcSettings),
+    m_pfpgasettings(fpgasettings),
+    m_pInputSettings(inputsettings)
 {
     m_sVersion = ECalcSystem::Version;
 
@@ -37,23 +42,23 @@ cECalculatorInterface::~cECalculatorInterface()
 }
 
 
-void cECalculatorInterface::initSCPIConnection(QString leadingNodes, cSCPI* scpiInterface)
+void cECalculatorInterface::initSCPIConnection(QString leadingNodes)
 {
     cSCPIDelegate* delegate;
 
     if (leadingNodes != "")
         leadingNodes += ":";
 
-    delegate = new cSCPIDelegate(QString("%1ECALCULATOR").arg(leadingNodes),"VERSION",SCPI::isQuery,scpiInterface, ECalcSystem::cmdVersion);
+    delegate = new cSCPIDelegate(QString("%1ECALCULATOR").arg(leadingNodes),"VERSION",SCPI::isQuery,m_pSCPIInterface, ECalcSystem::cmdVersion);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1ECALCULATOR:CHANNEL").arg(leadingNodes),"CATALOG", SCPI::isQuery, scpiInterface, ECalcSystem::cmdChannelCat);
+    delegate = new cSCPIDelegate(QString("%1ECALCULATOR:CHANNEL").arg(leadingNodes),"CATALOG", SCPI::isQuery, m_pSCPIInterface, ECalcSystem::cmdChannelCat);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1ECALCULATOR").arg(leadingNodes),"SET",SCPI::CmdwP,scpiInterface, ECalcSystem::cmdSetChannels);
+    delegate = new cSCPIDelegate(QString("%1ECALCULATOR").arg(leadingNodes),"SET",SCPI::CmdwP,m_pSCPIInterface, ECalcSystem::cmdSetChannels);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1ECALCULATOR").arg(leadingNodes),"FREE",SCPI::CmdwP,scpiInterface, ECalcSystem::cmdFreeChannels);
+    delegate = new cSCPIDelegate(QString("%1ECALCULATOR").arg(leadingNodes),"FREE",SCPI::CmdwP,m_pSCPIInterface, ECalcSystem::cmdFreeChannels);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
 
@@ -61,10 +66,10 @@ void cECalculatorInterface::initSCPIConnection(QString leadingNodes, cSCPI* scpi
     for (int i = 0; i < n; i++)
     {
         // we also must connect the signals for notification and for output
-        connect(m_ECalculatorChannelList.at(i), SIGNAL(notifier(cNotificationValue*)), this, SIGNAL(notifier(cNotificationValue*)));
+        connect(m_ECalculatorChannelList.at(i), &cSCPIConnection::valNotifier, this, &cSCPIConnection::valNotifier);
         connect(m_ECalculatorChannelList.at(i), SIGNAL(cmdExecutionDone(cProtonetCommand*)), this, SIGNAL(cmdExecutionDone(cProtonetCommand*)));
 
-        m_ECalculatorChannelList.at(i)->initSCPIConnection(QString("%1ECALCULATOR").arg(leadingNodes),scpiInterface);
+        m_ECalculatorChannelList.at(i)->initSCPIConnection(QString("%1ECALCULATOR").arg(leadingNodes));
     }
 }
 

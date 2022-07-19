@@ -6,7 +6,7 @@
 #include <scpi.h>
 
 #include "sec1000d.h"
-#include "scpiconnection.h"
+#include <scpiconnection.h>
 #include <scpidelegate.h>
 
 namespace StatusSystem
@@ -25,10 +25,10 @@ class cStatusInterface: public cSCPIConnection
 
 public:
     cStatusInterface();
-    virtual void initSCPIConnection(QString leadingNodes, cSCPI* scpiInterface);
+    virtual void initSCPIConnection(QString leadingNodes) override;
 
 protected slots:
-    virtual void executeCommand(int cmdCode, cProtonetCommand* protoCmd);
+    virtual void executeCommand(int cmdCode, cProtonetCommand* protoCmd) override;
 
 private:
     quint16 getDeviceStatus();

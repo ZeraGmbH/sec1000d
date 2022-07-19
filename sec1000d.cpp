@@ -48,10 +48,9 @@ struct sigaction mySigAction;
 // sigset_t mySigmask, origSigmask;
 
 
-cSEC1000dServer::cSEC1000dServer(QObject *parent)
-    :cPCBServer(parent)
+cSEC1000dServer::cSEC1000dServer()
+    :cPCBServer()
 {
-
     m_pDebugSettings = 0;
     m_pETHSettings = 0;
     m_pFPGAsettings = 0;

@@ -5,7 +5,7 @@
 #include <QList>
 #include <scpi.h>
 
-#include "scpiconnection.h"
+#include <scpiconnection.h>
 
 namespace SystemSystem
 {
@@ -31,10 +31,10 @@ class cSystemInterface: public cSCPIConnection
 
 public:
     cSystemInterface(cSEC1000dServer* server, cSystemInfo* sInfo);
-    virtual void initSCPIConnection(QString leadingNodes, cSCPI* scpiInterface);
+    virtual void initSCPIConnection(QString leadingNodes) override;
 
 protected slots:
-    virtual void executeCommand(int cmdCode, cProtonetCommand* protoCmd);
+    virtual void executeCommand(int cmdCode, cProtonetCommand* protoCmd) override;
 
 private:
     cSEC1000dServer* m_pMyServer;

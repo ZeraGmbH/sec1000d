@@ -1,42 +1,45 @@
+#include "systeminterface.h"
+#include "sec1000d.h"
+#include "sec1000dglobal.h"
+#include "systeminfo.h"
+#include "protonetcommand.h"
 #include <scpi.h>
 #include <scpicommand.h>
-
-#include "sec1000d.h"
 #include <scpidelegate.h>
-#include "systeminfo.h"
-#include "systeminterface.h"
-#include "protonetcommand.h"
+#include <scpisingletonfactory.h>
 
 
-cSystemInterface::cSystemInterface(cSEC1000dServer *server, cSystemInfo *sInfo)
-    :m_pMyServer(server), m_pSystemInfo(sInfo)
+cSystemInterface::cSystemInterface(cSEC1000dServer *server, cSystemInfo *sInfo) :
+    cSCPIConnection(ScpiSingletonFactory::getScpiObj(ServerName)),
+    m_pMyServer(server),
+    m_pSystemInfo(sInfo)
 {
 }
 
 
-void cSystemInterface::initSCPIConnection(QString leadingNodes, cSCPI *scpiInterface)
+void cSystemInterface::initSCPIConnection(QString leadingNodes)
 {
     cSCPIDelegate* delegate;
 
     if (leadingNodes != "")
         leadingNodes += ":";
 
-    delegate = new cSCPIDelegate(QString("%1SYSTEM:VERSION").arg(leadingNodes),"SERVER", SCPI::isQuery, scpiInterface, SystemSystem::cmdVersionServer);
+    delegate = new cSCPIDelegate(QString("%1SYSTEM:VERSION").arg(leadingNodes),"SERVER", SCPI::isQuery, m_pSCPIInterface, SystemSystem::cmdVersionServer);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1SYSTEM:VERSION").arg(leadingNodes),"DEVICE", SCPI::isQuery, scpiInterface, SystemSystem::cmdVersionDevice);
+    delegate = new cSCPIDelegate(QString("%1SYSTEM:VERSION").arg(leadingNodes),"DEVICE", SCPI::isQuery, m_pSCPIInterface, SystemSystem::cmdVersionDevice);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1SYSTEM:VERSION").arg(leadingNodes), "PCB", SCPI::isQuery | SCPI::isCmdwP, scpiInterface, SystemSystem::cmdVersionPCB);
+    delegate = new cSCPIDelegate(QString("%1SYSTEM:VERSION").arg(leadingNodes), "PCB", SCPI::isQuery | SCPI::isCmdwP, m_pSCPIInterface, SystemSystem::cmdVersionPCB);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1SYSTEM:VERSION").arg(leadingNodes), "FPGA", SCPI::isQuery, scpiInterface, SystemSystem::cmdVersionFPGA);
+    delegate = new cSCPIDelegate(QString("%1SYSTEM:VERSION").arg(leadingNodes), "FPGA", SCPI::isQuery, m_pSCPIInterface, SystemSystem::cmdVersionFPGA);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1SYSTEM").arg(leadingNodes), "SERIAL", SCPI::isQuery | SCPI::isCmdwP , scpiInterface, SystemSystem::cmdSerialNumber);
+    delegate = new cSCPIDelegate(QString("%1SYSTEM").arg(leadingNodes), "SERIAL", SCPI::isQuery | SCPI::isCmdwP , m_pSCPIInterface, SystemSystem::cmdSerialNumber);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
-    delegate = new cSCPIDelegate(QString("%1SYSTEM:INTERFACE").arg(leadingNodes), "READ", SCPI::isQuery, scpiInterface, SystemSystem::cmdInterfaceRead);
+    delegate = new cSCPIDelegate(QString("%1SYSTEM:INTERFACE").arg(leadingNodes), "READ", SCPI::isQuery, m_pSCPIInterface, SystemSystem::cmdInterfaceRead);
     m_DelegateList.append(delegate);
     connect(delegate, SIGNAL(execute(int, cProtonetCommand*)), this, SLOT(executeCommand(int, cProtonetCommand*)));
 }
@@ -204,7 +207,7 @@ QString cSystemInterface::m_InterfaceRead(QString &sInput)
     if (cmd.isQuery())
     {
         QString s;
-        m_pMyServer->getSCPIInterface()->exportSCPIModelXML(s);
+        ScpiSingletonFactory::getScpiObj(ServerName)->exportSCPIModelXML(s);
         return s;
     }
     else

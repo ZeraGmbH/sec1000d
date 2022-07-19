@@ -6,9 +6,9 @@
 #include <QHash>
 
 #include "resource.h"
-#include "scpiconnection.h"
+#include <scpiconnection.h>
 #include "ecalcchannel.h"
-#include "notificationvalue.h"
+#include <notificationvalue.h>
 
 namespace ECalcSystem
 {
@@ -42,13 +42,13 @@ class cECalculatorInterface : public cResource
 public:
     cECalculatorInterface(cSEC1000dServer* server, cETHSettings* ethsettings, cECalculatorSettings* ecalcSettings, cFPGASettings* fpgasettings, cInputSettings* inputsettings);
     ~cECalculatorInterface();
-    virtual void initSCPIConnection(QString leadingNodes, cSCPI* scpiInterface);
-    virtual void registerResource(cRMConnection *rmConnection, quint16 port);
+    void initSCPIConnection(QString leadingNodes) override;
+    virtual void registerResource(cRMConnection *rmConnection, quint16 port) override;
     virtual void unregisterResource(cRMConnection *rmConnection);
     QList<cECalculatorChannel*> getECalcChannelList();
 
 protected slots:
-    virtual void executeCommand(int cmdCode, cProtonetCommand* protoCmd);
+    virtual void executeCommand(int cmdCode, cProtonetCommand* protoCmd) override;
 
 private:
     cSEC1000dServer* m_pMyServer;
